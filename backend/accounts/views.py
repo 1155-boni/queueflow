@@ -39,7 +39,7 @@ class CustomLoginView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.user
-        refresh = self.get_token(user)
+        refresh = RefreshToken.for_user(user)
         return Response({
             'user': {
                 'id': user.id,

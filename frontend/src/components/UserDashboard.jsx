@@ -57,23 +57,30 @@ const UserDashboard = ({ user }) => {
   };
 
   return (
-    <div>
+    <div className="dashboard">
       <h2>User Dashboard</h2>
-      <h3>Service Points</h3>
-      <ul>
+      <div className="service-points">
+        <h3>Available Service Points <span className="realtime"></span></h3>
         {servicePoints.map((sp) => (
-          <li key={sp.id}>
-            {sp.name} <button onClick={() => joinQueue(sp.id)}>Join Queue</button>
-          </li>
+          <div key={sp.id} className="service-point">
+            <h3>{sp.name}</h3>
+            <p>{sp.description || 'No description available'}</p>
+            <p>Location: {sp.location || 'N/A'}</p>
+            <button className="btn-join" onClick={() => joinQueue(sp.id)}>Join Queue</button>
+          </div>
         ))}
-      </ul>
+      </div>
       {myQueue && (
-        <div>
-          <h3>My Queue Position</h3>
-          <p>Position: {myQueue.position}</p>
-          <p>Estimated Wait: {myQueue.estimated_wait_time} minutes</p>
-          <button onClick={leaveQueue}>Leave Queue</button>
+        <div className="queue-status">
+          <h3>Your Queue Status <span className="realtime"></span></h3>
+          <strong>Position: {myQueue.position}</strong>
+          <p>Status: {myQueue.status}</p>
+          <p>Estimated Wait Time: {myQueue.estimated_wait_time}</p>
+          <button className="btn-leave" onClick={leaveQueue}>Leave Queue</button>
         </div>
+      )}
+      {!myQueue && (
+        <p className="queue-status">No active queue. Join a service point above to start.</p>
       )}
     </div>
   );

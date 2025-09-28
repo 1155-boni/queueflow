@@ -1,38 +1,498 @@
+/* Global Styles - Mobile First */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f4f7fa;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Header */
+header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+nav button {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+nav button:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Main Content */
+main {
+  flex: 1;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Forms - Login/Register */
+.form-container {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: 2rem auto;
+  position: relative;
+  border: 2px solid #667eea;
+  backdrop-filter: blur(10px);
+}
+
+.form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 16px 16px 0 0;
+}
+
+.form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.form-title {
+  color: #667eea;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.form-icon-left {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  color: white;
+  font-size: 1.2rem;
+}
+
+.form-icon-right {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.8rem;
+  transform: rotate(45deg);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #aaa;
+}
+
+/* No pseudo-icons for now, use simple padding */
+
+button[type="submit"],
+.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]:hover,
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+button[type="submit"]:active,
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+button[type="submit"]:disabled,
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error {
+  background: linear-gradient(135deg, #fee 0%, #fcc 100%);
+  color: #c33;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  border-left: 4px solid #c33;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.success {
+  background: linear-gradient(135deg, #efe 0%, #cfc 100%);
+  color: #3c3;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  border-left: 4px solid #3c3;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Links */
+.forgot-link, .create-link, .switch-link {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  transition: color 0.3s ease;
+}
+
+.forgot-link:hover, .create-link:hover, .switch-link:hover {
+  color: #5a6fd8;
+  text-decoration: underline;
+}
+
+/* Switch between Login/Register */
+.switch-form {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e1e5e9;
+}
+
+.switch-form a {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.switch-form a:hover {
+  color: #5a6fd8;
+  text-decoration: underline;
+}
+
+/* Dashboards */
+.dashboard {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.dashboard h2 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+
+/* Service Points List */
+.service-points {
+  display: grid;
+  gap: 1rem;
+}
+
+.service-point {
+  background: #f8f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.service-point h3 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.service-point p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.btn-join,
+.btn-call,
+.btn-leave {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 0.25rem;
+  transition: background 0.3s;
+}
+
+.btn-join {
+  background: #28a745;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-join:hover {
+  background: #218838;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.btn-call {
+  background: #ffc107;
+  color: #333;
+}
+
+.btn-call:hover {
+  background: #e0a800;
+}
+
+.btn-leave {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-leave:hover {
+  background: #c82333;
+}
+
+/* Queue Position Display */
+.queue-status {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
+.queue-status strong {
+  display: block;
+  font-size: 2rem;
+}
+
+/* Analytics */
+.analytics {
+  display: grid;
+  gap: 1rem;
+}
+
+.metric-card {
+  background: #f8f9ff;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #e0e0e0;
+}
+
+.metric-card h3 {
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.metric-card p {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background: #f0f0f0;
+  font-weight: bold;
+  color: #333;
+}
+
+tr:hover {
+  background: #f8f9ff;
+}
+
+/* Real-time Indicator */
+.realtime {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #28a745;
+  border-radius: 50%;
+  margin-left: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Logout Button */
+.logout {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .form-container {
+    max-width: 500px;
+    padding: 3rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  header h1 {
+    font-size: 2rem;
   }
+
+  nav {
+    gap: 2rem;
+  }
+
+  .service-points {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  .analytics {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  main {
+    padding: 2rem;
+  }
+
+  .dashboard {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .service-points {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Loading Spinner */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

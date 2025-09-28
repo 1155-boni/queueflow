@@ -57,29 +57,47 @@ const StaffDashboard = ({ user }) => {
   };
 
   return (
-    <div>
+    <div className="dashboard">
       <h2>Staff Dashboard</h2>
-      <div>
+      <div className="form-group">
+        <label htmlFor="newSPName">Create New Service Point</label>
         <input
+          id="newSPName"
           type="text"
-          placeholder="New Service Point Name"
+          placeholder="Enter service point name"
           value={newSPName}
           onChange={(e) => setNewSPName(e.target.value)}
         />
-        <button onClick={createServicePoint}>Create Service Point</button>
+        <button className="btn-primary" onClick={createServicePoint}>Create Service Point</button>
       </div>
-      <h3>Service Points</h3>
-      <ul>
+      <div className="service-points">
+        <h3>Service Points <span className="realtime"></span></h3>
         {servicePoints.map((sp) => (
-          <li key={sp.id}>
-            {sp.name} - Queue Length: {sp.queue_length} <button onClick={() => callNext(sp.id)}>Call Next</button>
-          </li>
+          <div key={sp.id} className="service-point">
+            <h3>{sp.name}</h3>
+            <p>{sp.description || 'No description available'}</p>
+            <p>Location: {sp.location || 'N/A'}</p>
+            <p>Active: {sp.is_active ? 'Yes' : 'No'}</p>
+            <p>Current Queue Length: {sp.queue_length || 0}</p>
+            <button className="btn-call" onClick={() => callNext(sp.id)}>Call Next</button>
+          </div>
         ))}
-      </ul>
-      <h3>Analytics</h3>
-      <p>Average Wait Time: {analytics.average_wait_time} minutes</p>
-      <p>Busiest Hour: {analytics.busiest_hour}</p>
-      <p>Abandoned Queues: {analytics.abandoned_queues}</p>
+      </div>
+      <div className="analytics">
+        <h3>Analytics <span className="realtime"></span></h3>
+        <div className="metric-card">
+          <h3>Average Wait Time</h3>
+          <p>{analytics.average_wait_time || '0 minutes'}</p>
+        </div>
+        <div className="metric-card">
+          <h3>Busiest Hour</h3>
+          <p>{analytics.busiest_hour || 'N/A'}</p>
+        </div>
+        <div className="metric-card">
+          <h3>Abandoned Queues</h3>
+          <p>{analytics.abandoned_queues || 0}</p>
+        </div>
+      </div>
     </div>
   );
 };
