@@ -6,6 +6,19 @@ from .models import ServicePoint, QueueEntry
 from .serializers import ServicePointSerializer, QueueEntrySerializer, JoinQueueSerializer
 from django.db.models import Q, Avg, F, Count
 from django.utils import timezone
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+
+def send_queue_update(service_point_id):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f'queue_{service_point_id}',
+        {
+            'type': 'queue_update',
+            'data': {'message': 'Queue updated'}
+        }
+    )
 
 
 @api_view(['POST'])
@@ -38,6 +51,8 @@ def join_queue(request):
             position=waiting_count + 1,
             estimated_wait_time=waiting_count * 5  # Assume 5 minutes per person
         )
+
+        send_queue_update(service_point_id)
 
         serializer = QueueEntrySerializer(queue_entry)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -117,6 +132,7 @@ def call_next(request):
         next_entry.status = 'called'
         next_entry.called_at = timezone.now()
         next_entry.save()
+        send_queue_update(service_point_id)
         serializer = QueueEntrySerializer(next_entry)
         return Response(serializer.data)
     else:
@@ -148,6 +164,7 @@ def leave_queue(request):
             position__gt=queue_entry.position,
             status='waiting'
         ).update(position=F('position') - 1)
+        send_queue_update(service_point_id)
         return Response({'message': 'Left the queue.'})
     else:
         return Response({'error': 'Not in queue.'}, status=status.HTTP_400_BAD_REQUEST)
