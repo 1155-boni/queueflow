@@ -123,6 +123,36 @@ def call_next(request):
         return Response({'message': 'No one in queue.'}, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def leave_queue(request):
+    """
+    Allow user to leave the queue.
+    """
+    service_point_id = request.data.get('service_point_id')
+    if not service_point_id:
+        return Response({'error': 'service_point_id required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    queue_entry = QueueEntry.objects.filter(
+        service_point_id=service_point_id,
+        user=request.user,
+        status__in=['waiting', 'called']
+    ).first()
+
+    if queue_entry:
+        queue_entry.status = 'left'
+        queue_entry.save()
+        # Update positions of others
+        QueueEntry.objects.filter(
+            service_point_id=service_point_id,
+            position__gt=queue_entry.position,
+            status='waiting'
+        ).update(position=F('position') - 1)
+        return Response({'message': 'Left the queue.'})
+    else:
+        return Response({'error': 'Not in queue.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def analytics(request):
