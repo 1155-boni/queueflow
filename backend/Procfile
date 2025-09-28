@@ -1,0 +1,2 @@
+web: gunicorn queueflow.wsgi
+worker: daphne -b 0.0.0.0 -p 8001 queueflow.asgi:application
