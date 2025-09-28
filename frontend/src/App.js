@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
-import Login from './components/Login';
-import Register from './components/Register';
-import UserDashboard from './components/UserDashboard';
-import StaffDashboard from './components/StaffDashboard';
+import Login from './components/Login.jsx';
+import Register from './components/Register.jsx';
+import UserDashboard from './components/UserDashboard.jsx';
+import StaffDashboard from './components/StaffDashboard.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
