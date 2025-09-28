@@ -6,6 +6,7 @@ from .models import ServicePoint, QueueEntry
 from .serializers import ServicePointSerializer, QueueEntrySerializer, JoinQueueSerializer
 from django.db.models import Q, Avg, F, Count
 from django.utils import timezone
+from datetime import timedelta
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
@@ -49,7 +50,7 @@ def join_queue(request):
             service_point=service_point,
             user=request.user,
             position=waiting_count + 1,
-            estimated_wait_time=waiting_count * 5  # Assume 5 minutes per person
+            estimated_wait_time=timedelta(minutes=waiting_count * 5)  # Assume 5 minutes per person
         )
 
         send_queue_update(service_point_id)
