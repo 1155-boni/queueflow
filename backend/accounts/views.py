@@ -6,6 +6,9 @@ from .serializers import RegisterSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import LoginSerializer
+from queues.models import ServicePoint
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 @api_view(['POST'])
@@ -59,5 +62,19 @@ def delete_user(request):
     Allow authenticated user to delete their own account.
     """
     user = request.user
+    # Deactivate all service points owned by the user
+    service_points = ServicePoint.objects.filter(creator=user)
+    for sp in service_points:
+        sp.is_active = False
+        sp.save()
+        # Notify connected clients
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'queue_{sp.id}',
+            {
+                'type': 'queue_update',
+                'data': {'deleted': True}
+            }
+        )
     user.delete()
     return Response({'message': 'Account deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
