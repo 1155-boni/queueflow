@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
+  const { t, i18n } = useTranslation();
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
@@ -15,12 +17,14 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   };
 
   const handleLanguageChange = (e) => {
-    setLanguage(e.target.value);
-    localStorage.setItem('language', e.target.value);
+    const selectedLanguage = e.target.value;
+    setLanguage(selectedLanguage);
+    localStorage.setItem('language', selectedLanguage);
+    i18n.changeLanguage(selectedLanguage);
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (window.confirm(t('settings.confirmDelete'))) {
       try {
         await axios.delete('http://localhost:8000/api/auth/delete-user/', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -28,37 +32,38 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
         onDeleteAccount();
       } catch (err) {
         console.error(err);
-        alert('Failed to delete account.');
+        alert(t('common.error'));
       }
     }
   };
 
   return (
     <div className="settings">
-      <h2>Settings</h2>
+      <h2>{t('settings.title')}</h2>
       <div className="setting-group">
-        <button onClick={onBackToDashboard} className="btn-primary">Back to Dashboard</button>
+        <button onClick={onBackToDashboard} className="btn-primary">{t('settings.backToDashboard')}</button>
       </div>
       <div className="setting-group">
-        <label htmlFor="theme">Theme:</label>
+        <label htmlFor="theme">{t('settings.theme')}:</label>
         <select id="theme" value={theme} onChange={handleThemeChange}>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
+          <option value="light">{t('settings.light')}</option>
+          <option value="dark">{t('settings.dark')}</option>
         </select>
       </div>
       <div className="setting-group">
-        <label htmlFor="language">Language:</label>
+        <label htmlFor="language">{t('settings.language')}:</label>
         <select id="language" value={language} onChange={handleLanguageChange}>
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-          <option value="fr">French</option>
+          <option value="en">{t('settings.english')}</option>
+          <option value="es">{t('settings.spanish')}</option>
+          <option value="fr">{t('settings.french')}</option>
+          <option value="sw">{t('settings.swahili')}</option>
         </select>
       </div>
       <div className="setting-group">
-        <button onClick={onLogout} className="btn-logout">Logout</button>
+        <button onClick={onLogout} className="btn-logout">{t('settings.logout')}</button>
       </div>
       <div className="setting-group">
-        <button onClick={handleDeleteAccount} className="btn-delete">Delete Account</button>
+        <button onClick={handleDeleteAccount} className="btn-delete">{t('settings.deleteAccount')}</button>
       </div>
     </div>
   );

@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "QueueFlow",
+    "welcome": "Bienvenido, {{username}}",
+    "settings": "Configuración"
+  },
+  "login": {
+    "title": "Iniciar Sesión",
+    "username": "Nombre de Usuario",
+    "password": "Contraseña",
+    "submit": "Iniciar Sesión",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate"
+  },
+  "register": {
+    "title": "Registrarse",
+    "username": "Nombre de Usuario",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "submit": "Registrarse",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "login": "Iniciar Sesión"
+  },
+  "dashboard": {
+    "servicePoints": "Puntos de Servicio",
+    "joinQueue": "Unirse a la Cola",
+    "callNext": "Llamar al Siguiente",
+    "leaveQueue": "Salir de la Cola",
+    "delete": "Eliminar",
+    "queueStatus": "Tu Posición en la Cola",
+    "position": "Posición: {{position}}",
+    "analytics": "Análisis",
+    "totalServicePoints": "Total de Puntos de Servicio",
+    "activeQueues": "Colas Activas",
+    "totalUsers": "Total de Usuarios"
+  },
+  "staff": {
+    "manageQueues": "Gestionar Colas",
+    "servicePoint": "Punto de Servicio: {{name}}",
+    "queueLength": "Longitud de la Cola: {{length}}",
+    "noQueues": "No hay colas activas"
+  },
+  "settings": {
+    "title": "Configuración",
+    "backToDashboard": "Volver al Panel",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "language": "Idioma",
+    "english": "Inglés",
+    "spanish": "Español",
+    "french": "Francés",
+    "swahili": "Suajili",
+    "logout": "Cerrar Sesión",
+    "deleteAccount": "Eliminar Cuenta",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer."
+  },
+  "common": {
+    "error": "Error",
+    "success": "Éxito",
+    "loading": "Cargando...",
+    "realtime": "En Vivo"
+  },
+  "queue": {
+    "joinSuccess": "¡Te has unido a la cola exitosamente!",
+    "leaveSuccess": "¡Has salido de la cola exitosamente!",
+    "callSuccess": "¡Llamada al siguiente cliente exitosamente!",
+    "deleteSuccess": "¡Punto de servicio eliminado exitosamente!",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este punto de servicio?"
+  }
+}

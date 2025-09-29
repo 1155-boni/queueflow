@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "QueueFlow",
+    "welcome": "Karibu, {{username}}",
+    "settings": "Mipangilio"
+  },
+  "login": {
+    "title": "Ingia",
+    "username": "Jina la Mtumiaji",
+    "password": "Nenosiri",
+    "submit": "Ingia",
+    "forgotPassword": "Umesahau Nenosiri?",
+    "noAccount": "Huna akaunti?",
+    "signUp": "Jisajili"
+  },
+  "register": {
+    "title": "Jisajili",
+    "username": "Jina la Mtumiaji",
+    "email": "Barua Pepe",
+    "password": "Nenosiri",
+    "confirmPassword": "Thibitisha Nenosiri",
+    "submit": "Jisajili",
+    "haveAccount": "Una akaunti tayari?",
+    "login": "Ingia"
+  },
+  "dashboard": {
+    "servicePoints": "Vituo vya Huduma",
+    "joinQueue": "Jiunge na Foleni",
+    "callNext": "Piga Simu Mwingine",
+    "leaveQueue": "Ondoka Foleni",
+    "delete": "Futa",
+    "queueStatus": "Mahali Pako kwenye Foleni",
+    "position": "Mahali: {{position}}",
+    "analytics": "Mchanganuo",
+    "totalServicePoints": "Jumla ya Vituo vya Huduma",
+    "activeQueues": "Folenzi Zinazofanya Kazi",
+    "totalUsers": "Jumla ya Watumiaji"
+  },
+  "staff": {
+    "manageQueues": "Dhibiti Folenzi",
+    "servicePoint": "Kituo cha Huduma: {{name}}",
+    "queueLength": "Urefu wa Foleni: {{length}}",
+    "noQueues": "Hakuna folenzi zinazofanya kazi"
+  },
+  "settings": {
+    "title": "Mipangilio",
+    "backToDashboard": "Rudi kwenye Dashibodi",
+    "theme": "Mandhari",
+    "light": "Nyepesi",
+    "dark": "Giza",
+    "language": "Lugha",
+    "english": "Kiingereza",
+    "spanish": "Kihispania",
+    "french": "Kifaransa",
+    "swahili": "Kiswahili",
+    "logout": "Toka",
+    "deleteAccount": "Futa Akaunti",
+    "confirmDelete": "Una uhakika unataka kufuta akaunti yako? Hatua hii haiwezi kurekebishwa."
+  },
+  "common": {
+    "error": "Hitilafu",
+    "success": "Ufanisi",
+    "loading": "Inapakia...",
+    "realtime": "Moja kwa Moja"
+  },
+  "queue": {
+    "joinSuccess": "Umejiunga na foleni kwa mafanikio!",
+    "leaveSuccess": "Umetoka foleni kwa mafanikio!",
+    "callSuccess": "Umemwita mteja mwingine kwa mafanikio!",
+    "deleteSuccess": "Kituo cha huduma kimefutwa kwa mafanikio!",
+    "deleteConfirm": "Una uhakika unataka kufuta kituo hiki cha huduma?"
+  }
+}

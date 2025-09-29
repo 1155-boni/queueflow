@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "QueueFlow",
+    "welcome": "Bienvenue, {{username}}",
+    "settings": "Paramètres"
+  },
+  "login": {
+    "title": "Connexion",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "forgotPassword": "Mot de passe oublié ?",
+    "noAccount": "Pas de compte ?",
+    "signUp": "S'inscrire"
+  },
+  "register": {
+    "title": "S'inscrire",
+    "username": "Nom d'utilisateur",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "submit": "S'inscrire",
+    "haveAccount": "Déjà un compte ?",
+    "login": "Se connecter"
+  },
+  "dashboard": {
+    "servicePoints": "Points de service",
+    "joinQueue": "Rejoindre la file",
+    "callNext": "Appeler le suivant",
+    "leaveQueue": "Quitter la file",
+    "delete": "Supprimer",
+    "queueStatus": "Votre position dans la file",
+    "position": "Position : {{position}}",
+    "analytics": "Analyses",
+    "totalServicePoints": "Total des points de service",
+    "activeQueues": "Files actives",
+    "totalUsers": "Total des utilisateurs"
+  },
+  "staff": {
+    "manageQueues": "Gérer les files",
+    "servicePoint": "Point de service : {{name}}",
+    "queueLength": "Longueur de la file : {{length}}",
+    "noQueues": "Aucune file active"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "backToDashboard": "Retour au tableau de bord",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "language": "Langue",
+    "english": "Anglais",
+    "spanish": "Espagnol",
+    "french": "Français",
+    "swahili": "Swahili",
+    "logout": "Déconnexion",
+    "deleteAccount": "Supprimer le compte",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
+  },
+  "common": {
+    "error": "Erreur",
+    "success": "Succès",
+    "loading": "Chargement...",
+    "realtime": "En direct"
+  },
+  "queue": {
+    "joinSuccess": "Rejoint la file avec succès !",
+    "leaveSuccess": "A quitté la file avec succès !",
+    "callSuccess": "Appel du client suivant avec succès !",
+    "deleteSuccess": "Point de service supprimé avec succès !",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce point de service ?"
+  }
+}

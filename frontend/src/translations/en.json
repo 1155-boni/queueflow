@@ -1,0 +1,73 @@
+{
+  "app": {
+    "title": "QueueFlow",
+    "welcome": "Welcome, {{username}}",
+    "settings": "Settings"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  },
+  "register": {
+    "title": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Register",
+    "haveAccount": "Already have an account?",
+    "login": "Login"
+  },
+  "dashboard": {
+    "servicePoints": "Service Points",
+    "joinQueue": "Join Queue",
+    "callNext": "Call Next",
+    "leaveQueue": "Leave Queue",
+    "delete": "Delete",
+    "queueStatus": "Your Position in Queue",
+    "position": "Position: {{position}}",
+    "analytics": "Analytics",
+    "totalServicePoints": "Total Service Points",
+    "activeQueues": "Active Queues",
+    "totalUsers": "Total Users"
+  },
+  "staff": {
+    "manageQueues": "Manage Queues",
+    "servicePoint": "Service Point: {{name}}",
+    "queueLength": "Queue Length: {{length}}",
+    "noQueues": "No active queues"
+  },
+  "settings": {
+    "title": "Settings",
+    "backToDashboard": "Back to Dashboard",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "language": "Language",
+    "english": "English",
+    "spanish": "Spanish",
+    "french": "French",
+    "swahili": "Swahili",
+    "logout": "Logout",
+    "deleteAccount": "Delete Account",
+    "confirmDelete": "Are you sure you want to delete your account? This action cannot be undone."
+  },
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "loading": "Loading...",
+    "realtime": "Live"
+  },
+  "queue": {
+    "joinSuccess": "Joined queue successfully!",
+    "leaveSuccess": "Left queue successfully!",
+    "callSuccess": "Called next customer successfully!",
+    "deleteSuccess": "Service point deleted successfully!",
+    "deleteConfirm": "Are you sure you want to delete this service point?"
+  }
+}
