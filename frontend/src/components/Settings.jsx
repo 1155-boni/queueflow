@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const Settings = ({ user, onLogout, onDeleteAccount }) => {
+const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
 
@@ -36,6 +36,9 @@ const Settings = ({ user, onLogout, onDeleteAccount }) => {
   return (
     <div className="settings">
       <h2>Settings</h2>
+      <div className="setting-group">
+        <button onClick={onBackToDashboard} className="btn-primary">Back to Dashboard</button>
+      </div>
       <div className="setting-group">
         <label htmlFor="theme">Theme:</label>
         <select id="theme" value={theme} onChange={handleThemeChange}>

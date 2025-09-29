@@ -36,6 +36,10 @@ function App() {
     setView('settings');
   };
 
+  const handleBackToDashboard = () => {
+    setView('dashboard');
+  };
+
   return (
     <div className="App">
       <header>
@@ -55,7 +59,7 @@ function App() {
             <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />
           )
         ) : view === 'settings' ? (
-          <Settings user={user} onLogout={handleLogout} onDeleteAccount={handleDeleteAccount} />
+          <Settings user={user} onLogout={handleLogout} onDeleteAccount={handleDeleteAccount} onBackToDashboard={handleBackToDashboard} />
         ) : (
           <div>
             {user.role === 'customer' ? (
