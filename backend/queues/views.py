@@ -13,11 +13,16 @@ from channels.layers import get_channel_layer
 
 def send_queue_update(service_point_id):
     channel_layer = get_channel_layer()
+    # Calculate current queue length (waiting + called)
+    queue_length = QueueEntry.objects.filter(
+        service_point_id=service_point_id,
+        status__in=['waiting', 'called']
+    ).count()
     async_to_sync(channel_layer.group_send)(
         f'queue_{service_point_id}',
         {
             'type': 'queue_update',
-            'data': {'message': 'Queue updated'}
+            'data': {'queue_length': queue_length}
         }
     )
 

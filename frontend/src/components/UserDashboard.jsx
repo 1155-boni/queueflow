@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
@@ -6,11 +6,32 @@ const UserDashboard = ({ user }) => {
   const { t } = useTranslation();
   const [servicePoints, setServicePoints] = useState([]);
   const [myQueue, setMyQueue] = useState(null);
+  const wsRefs = useRef({});
 
   useEffect(() => {
     fetchServicePoints();
     fetchMyQueue();
   }, []);
+
+  useEffect(() => {
+    servicePoints.forEach(sp => {
+      if (!wsRefs.current[sp.id]) {
+        const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.queue_length !== undefined) {
+            setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
+          }
+        };
+        wsRefs.current[sp.id] = ws;
+      }
+    });
+
+    return () => {
+      Object.values(wsRefs.current).forEach(ws => ws.close());
+      wsRefs.current = {};
+    };
+  }, [servicePoints]);
 
   const fetchServicePoints = async () => {
     try {
@@ -68,6 +89,7 @@ const UserDashboard = ({ user }) => {
             <h3>{sp.name}</h3>
             <p>{sp.description || 'No description available'}</p>
             <p>Location: {sp.location || 'N/A'}</p>
+            <p>Queue Length: {sp.queue_length || 0}</p>
             <button className="btn-join" onClick={() => joinQueue(sp.id)}>{t('dashboard.joinQueue')}</button>
           </div>
         ))}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
@@ -12,11 +12,32 @@ const StaffDashboard = ({ user }) => {
     location: '',
     is_active: true,
   });
+  const wsRefs = useRef({});
 
   useEffect(() => {
     fetchServicePoints();
     fetchAnalytics();
   }, []);
+
+  useEffect(() => {
+    servicePoints.forEach(sp => {
+      if (!wsRefs.current[sp.id]) {
+        const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.queue_length !== undefined) {
+            setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
+          }
+        };
+        wsRefs.current[sp.id] = ws;
+      }
+    });
+
+    return () => {
+      Object.values(wsRefs.current).forEach(ws => ws.close());
+      wsRefs.current = {};
+    };
+  }, [servicePoints]);
 
   const fetchServicePoints = async () => {
     try {
