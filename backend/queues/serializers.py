@@ -9,6 +9,11 @@ class ServicePointSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'description', 'location', 'is_active', 'created_at')
         read_only_fields = ('created_at',)
 
+    def validate_location(self, value):
+        if not value:
+            raise serializers.ValidationError("Location is required.")
+        return value
+
 
 class QueueEntrySerializer(serializers.ModelSerializer):
     service_point = ServicePointSerializer(read_only=True)

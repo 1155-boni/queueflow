@@ -106,6 +106,23 @@ def create_service_point(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_service_point(request, service_point_id):
+    """
+    Staff can delete a service point.
+    """
+    if request.user.role != 'staff':
+        return Response({'error': 'Only staff can delete service points.'}, status=status.HTTP_403_FORBIDDEN)
+
+    try:
+        service_point = ServicePoint.objects.get(id=service_point_id)
+        service_point.delete()
+        return Response({'message': 'Service point deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    except ServicePoint.DoesNotExist:
+        return Response({'error': 'Service point not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def call_next(request):
