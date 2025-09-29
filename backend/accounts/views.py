@@ -50,3 +50,14 @@ class CustomLoginView(TokenObtainPairView):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user(request):
+    """
+    Allow authenticated user to delete their own account.
+    """
+    user = request.user
+    user.delete()
+    return Response({'message': 'Account deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)

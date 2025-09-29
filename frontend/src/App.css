@@ -312,7 +312,8 @@ button[type="submit"]:disabled,
 
 .btn-join,
 .btn-call,
-.btn-leave {
+.btn-leave,
+.btn-delete {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 5px;
@@ -346,6 +347,15 @@ button[type="submit"]:disabled,
 }
 
 .btn-leave:hover {
+  background: #c82333;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
   background: #c82333;
 }
 
@@ -495,4 +505,99 @@ tr:hover {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Dark Theme */
+body.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body.dark .App {
+  background-color: #121212;
+}
+
+body.dark header {
+  background: linear-gradient(135deg, #333 0%, #555 100%);
+}
+
+body.dark .form-container {
+  background: #1e1e1e;
+  color: #ffffff;
+  border-color: #555;
+}
+
+body.dark .dashboard {
+  background: #1e1e1e;
+  color: #ffffff;
+}
+
+body.dark .service-point {
+  background: #2a2a2a;
+  border-left-color: #667eea;
+}
+
+body.dark .metric-card {
+  background: #2a2a2a;
+  border-color: #555;
+}
+
+body.dark .queue-status {
+  background: linear-gradient(135deg, #333 0%, #555 100%);
+}
+
+/* Settings Styles */
+.settings {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+body.dark .settings {
+  background: #1e1e1e;
+  color: #ffffff;
+}
+
+.setting-group {
+  margin-bottom: 1.5rem;
+}
+
+.setting-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.setting-group select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  color: #333;
+}
+
+body.dark .setting-group select {
+  background: #2a2a2a;
+  color: #ffffff;
+  border-color: #555;
+}
+
+.btn-logout,
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.btn-logout:hover,
+.btn-delete:hover {
+  background: #c82333;
 }

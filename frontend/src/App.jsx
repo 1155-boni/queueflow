@@ -4,6 +4,7 @@ import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
 import StaffDashboard from './components/StaffDashboard.jsx';
+import Settings from './components/Settings.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,6 +26,16 @@ function App() {
     setView('login');
   };
 
+  const handleDeleteAccount = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    setView('login');
+  };
+
+  const handleSettings = () => {
+    setView('settings');
+  };
+
   return (
     <div className="App">
       <header>
@@ -32,7 +43,7 @@ function App() {
         {user && (
           <nav>
             <span>Welcome, {user.username}</span>
-            <button onClick={handleLogout} className="logout">Logout</button>
+            <button onClick={handleSettings} className="settings-btn">Settings</button>
           </nav>
         )}
       </header>
@@ -43,6 +54,8 @@ function App() {
           ) : (
             <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />
           )
+        ) : view === 'settings' ? (
+          <Settings user={user} onLogout={handleLogout} onDeleteAccount={handleDeleteAccount} />
         ) : (
           <div>
             {user.role === 'customer' ? (

@@ -56,6 +56,20 @@ const StaffDashboard = ({ user }) => {
     }
   };
 
+  const deleteServicePoint = async (servicePointId) => {
+    if (window.confirm('Are you sure you want to delete this service point?')) {
+      try {
+        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        fetchServicePoints();
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete service point.');
+      }
+    }
+  };
+
   return (
     <div className="dashboard">
       <h2>Staff Dashboard</h2>
@@ -80,6 +94,7 @@ const StaffDashboard = ({ user }) => {
             <p>Active: {sp.is_active ? 'Yes' : 'No'}</p>
             <p>Current Queue Length: {sp.queue_length || 0}</p>
             <button className="btn-call" onClick={() => callNext(sp.id)}>Call Next</button>
+            <button className="btn-delete" onClick={() => deleteServicePoint(sp.id)}>Delete</button>
           </div>
         ))}
       </div>
