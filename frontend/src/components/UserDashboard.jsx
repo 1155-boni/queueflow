@@ -19,7 +19,9 @@ const UserDashboard = ({ user }) => {
         const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
-          if (data.queue_length !== undefined) {
+          if (data.deleted) {
+            setServicePoints(prev => prev.filter(s => s.id !== sp.id));
+          } else if (data.queue_length !== undefined) {
             setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
           }
         };

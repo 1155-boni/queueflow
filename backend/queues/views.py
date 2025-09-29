@@ -126,6 +126,15 @@ def delete_service_point(request, service_point_id):
     try:
         service_point = ServicePoint.objects.get(id=service_point_id)
         service_point.delete()
+        # Notify connected clients that the service point is deleted
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'queue_{service_point_id}',
+            {
+                'type': 'queue_update',
+                'data': {'deleted': True}
+            }
+        )
         return Response({'message': 'Service point deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
     except ServicePoint.DoesNotExist:
         return Response({'error': 'Service point not found.'}, status=status.HTTP_404_NOT_FOUND)
