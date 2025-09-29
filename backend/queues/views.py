@@ -83,9 +83,12 @@ def my_queue_position(request):
 @permission_classes([IsAuthenticated])
 def service_points(request):
     """
-    List all active service points.
+    List active service points. For staff, only their own; for customers, all active.
     """
-    service_points = ServicePoint.objects.filter(is_active=True)
+    if request.user.role == 'staff':
+        service_points = ServicePoint.objects.filter(is_active=True, creator=request.user)
+    else:
+        service_points = ServicePoint.objects.filter(is_active=True)
     serializer = ServicePointSerializer(service_points, many=True)
     return Response(serializer.data)
 
@@ -101,7 +104,7 @@ def create_service_point(request):
 
     serializer = ServicePointSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(creator=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,8 +6,8 @@ from accounts.models import User
 class ServicePointSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServicePoint
-        fields = ('id', 'name', 'description', 'location', 'is_active', 'created_at')
-        read_only_fields = ('created_at',)
+        fields = ('id', 'name', 'description', 'location', 'is_active', 'created_at', 'creator')
+        read_only_fields = ('created_at', 'creator')
 
     def validate_location(self, value):
         if not value:

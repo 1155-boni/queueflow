@@ -8,6 +8,7 @@ class ServicePoint(models.Model):
     location = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_service_points')
 
     def __str__(self):
         return self.name
