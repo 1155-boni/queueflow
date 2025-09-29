@@ -69,7 +69,7 @@ const UserDashboard = ({ user }) => {
   const leaveQueue = async () => {
     if (myQueue) {
       try {
-        await axios.post('http://localhost:8000/api/queues/leave/', { service_point_id: myQueue.service_point }, {
+        await axios.post('http://localhost:8000/api/queues/leave/', { service_point_id: myQueue.service_point.id }, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setMyQueue(null);
