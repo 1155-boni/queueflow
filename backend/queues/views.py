@@ -124,8 +124,9 @@ def delete_service_point(request, service_point_id):
         return Response({'error': 'Only staff can delete service points.'}, status=status.HTTP_403_FORBIDDEN)
 
     try:
-        service_point = ServicePoint.objects.get(id=service_point_id)
-        service_point.delete()
+        service_point = ServicePoint.objects.get(id=service_point_id, creator=request.user)
+        service_point.is_active = False
+        service_point.save()
         # Notify connected clients that the service point is deleted
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(

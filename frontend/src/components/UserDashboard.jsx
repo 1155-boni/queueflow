@@ -99,7 +99,7 @@ const UserDashboard = ({ user }) => {
       {myQueue && (
         <div className="queue-status">
           <h3>{t('dashboard.queueStatus')} <span className="realtime">{t('common.realtime')}</span></h3>
-          <p>Service Point: {myQueue.service_point.name}</p>
+          <p>Service Point: {myQueue.service_point?.name}</p>
           <strong>{t('dashboard.position', { position: myQueue.position })}</strong>
           <p>Status: {myQueue.status}</p>
           <p>Estimated Wait Time: {myQueue.estimated_wait_time}</p>
