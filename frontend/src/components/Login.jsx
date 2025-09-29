@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const Login = ({ onLogin, onSwitchToRegister }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,38 +26,38 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
     <div className="form-container">
       <div className="form-header">
         <div className="form-icon-left">💻</div>
-        <h2 className="form-title">Member Login</h2>
+        <h2 className="form-title">{t('login.title')}</h2>
         <div className="form-icon-right">▶</div>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{t('login.username')}</label>
           <input
             id="username"
             type="text"
-            placeholder="Enter username"
+            placeholder={`Enter ${t('login.username').toLowerCase()}`}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{t('login.password')}</label>
           <input
             id="password"
             type="password"
-            placeholder="Enter password"
+            placeholder={`Enter ${t('login.password').toLowerCase()}`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button type="submit">Login</button>
-        <a href="#" className="forgot-link">Forgot Login/Password?</a>
+        <button type="submit">{t('login.submit')}</button>
+        <a href="#" className="forgot-link">{t('login.forgotPassword')}</a>
       </form>
       {error && <p className="error">{error}</p>}
       <div className="switch-form">
-        <p>Don't have an account? <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToRegister(); }}>Create your account</a></p>
+        <p>{t('login.noAccount')} <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToRegister(); }}>{t('login.signUp')}</a></p>
       </div>
     </div>
   );

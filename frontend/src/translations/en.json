@@ -5,13 +5,13 @@
     "settings": "Settings"
   },
   "login": {
-    "title": "Login",
+    "title": "Member Login",
     "username": "Username",
     "password": "Password",
     "submit": "Login",
-    "forgotPassword": "Forgot Password?",
+    "forgotPassword": "Forgot Login/Password?",
     "noAccount": "Don't have an account?",
-    "signUp": "Sign up"
+    "signUp": "Create your account"
   },
   "register": {
     "title": "Register",
@@ -40,7 +40,8 @@
     "manageQueues": "Manage Queues",
     "servicePoint": "Service Point: {{name}}",
     "queueLength": "Queue Length: {{length}}",
-    "noQueues": "No active queues"
+    "noQueues": "No active queues",
+    "createServicePoint": "Create Service Point"
   },
   "settings": {
     "title": "Settings",
@@ -61,7 +62,11 @@
     "error": "Error",
     "success": "Success",
     "loading": "Loading...",
-    "realtime": "Live"
+    "realtime": "Live",
+    "name": "Name",
+    "description": "Description",
+    "location": "Location",
+    "active": "Active"
   },
   "queue": {
     "joinSuccess": "Joined queue successfully!",

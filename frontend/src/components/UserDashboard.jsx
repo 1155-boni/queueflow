@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const UserDashboard = ({ user }) => {
+  const { t } = useTranslation();
   const [servicePoints, setServicePoints] = useState([]);
   const [myQueue, setMyQueue] = useState(null);
 
@@ -58,25 +60,25 @@ const UserDashboard = ({ user }) => {
 
   return (
     <div className="dashboard">
-      <h2>User Dashboard</h2>
+      <h2>{t('app.welcome', { username: user.username })}</h2>
       <div className="service-points">
-        <h3>Available Service Points <span className="realtime"></span></h3>
+        <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
         {servicePoints.map((sp) => (
           <div key={sp.id} className="service-point">
             <h3>{sp.name}</h3>
             <p>{sp.description || 'No description available'}</p>
             <p>Location: {sp.location || 'N/A'}</p>
-            <button className="btn-join" onClick={() => joinQueue(sp.id)}>Join Queue</button>
+            <button className="btn-join" onClick={() => joinQueue(sp.id)}>{t('dashboard.joinQueue')}</button>
           </div>
         ))}
       </div>
       {myQueue && (
         <div className="queue-status">
-          <h3>Your Queue Status <span className="realtime"></span></h3>
-          <strong>Position: {myQueue.position}</strong>
+          <h3>{t('dashboard.queueStatus')} <span className="realtime">{t('common.realtime')}</span></h3>
+          <strong>{t('dashboard.position', { position: myQueue.position })}</strong>
           <p>Status: {myQueue.status}</p>
           <p>Estimated Wait Time: {myQueue.estimated_wait_time}</p>
-          <button className="btn-leave" onClick={leaveQueue}>Leave Queue</button>
+          <button className="btn-leave" onClick={leaveQueue}>{t('dashboard.leaveQueue')}</button>
         </div>
       )}
       {!myQueue && (

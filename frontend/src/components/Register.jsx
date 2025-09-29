@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const Register = ({ onRegister, onSwitchToLogin }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,37 +30,37 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
     <div className="form-container">
       <div className="form-header">
         <div className="form-icon-left">👤</div>
-        <h2 className="form-title">Sign Up</h2>
+        <h2 className="form-title">{t('register.title')}</h2>
         <div className="form-icon-right">▶</div>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{t('register.username')}</label>
           <input
             id="username"
             type="text"
-            placeholder="Enter username"
+            placeholder={`Enter ${t('register.username').toLowerCase()}`}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email (optional)</label>
+          <label htmlFor="email">{t('register.email')}</label>
           <input
             id="email"
             type="email"
-            placeholder="Enter email"
+            placeholder={`Enter ${t('register.email').toLowerCase()}`}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{t('register.password')}</label>
           <input
             id="password"
             type="password"
-            placeholder="Enter password"
+            placeholder={`Enter ${t('register.password').toLowerCase()}`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -71,11 +73,11 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
             <option value="staff">Staff</option>
           </select>
         </div>
-        <button type="submit">Register</button>
+        <button type="submit">{t('register.submit')}</button>
       </form>
       {error && <p className="error">{error}</p>}
       <div className="switch-form">
-        <p>Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToLogin(); }}>Login here</a></p>
+        <p>{t('register.haveAccount')} <a href="#" onClick={(e) => { e.preventDefault(); onSwitchToLogin(); }}>{t('register.login')}</a></p>
       </div>
     </div>
   );
