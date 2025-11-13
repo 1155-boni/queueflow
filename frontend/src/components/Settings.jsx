@@ -26,9 +26,7 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   const handleDeleteAccount = async () => {
     if (window.confirm(t('settings.confirmDelete'))) {
       try {
-        await axios.delete('http://localhost:8000/api/auth/delete-user/', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        await axios.delete('http://localhost:8000/api/auth/delete-user/');
         onDeleteAccount();
       } catch (err) {
         console.error(err);

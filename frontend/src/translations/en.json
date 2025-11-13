@@ -26,6 +26,7 @@
   "dashboard": {
     "servicePoints": "Service Points",
     "joinQueue": "Join Queue",
+    "joined": "Joined",
     "callNext": "Call Next",
     "leaveQueue": "Leave Queue",
     "delete": "Delete",

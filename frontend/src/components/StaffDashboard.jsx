@@ -41,9 +41,7 @@ const StaffDashboard = ({ user }) => {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/service-points/', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const response = await axios.get('http://localhost:8000/api/queues/service-points/');
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -52,9 +50,7 @@ const StaffDashboard = ({ user }) => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/analytics/', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const response = await axios.get('http://localhost:8000/api/queues/analytics/');
       setAnalytics(response.data);
     } catch (err) {
       console.error(err);
@@ -63,9 +59,7 @@ const StaffDashboard = ({ user }) => {
 
   const createServicePoint = async () => {
     try {
-      await axios.post('http://localhost:8000/api/queues/create-service-point/', newServicePoint, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      await axios.post('http://localhost:8000/api/queues/create-service-point/', newServicePoint);
       setNewServicePoint({
         name: '',
         description: '',
@@ -80,9 +74,7 @@ const StaffDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post('http://localhost:8000/api/queues/call-next/', { service_point_id: servicePointId }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      await axios.post('http://localhost:8000/api/queues/call-next/', { service_point_id: servicePointId });
       fetchServicePoints();
     } catch (err) {
       console.error(err);
@@ -92,10 +84,21 @@ const StaffDashboard = ({ user }) => {
   const deleteServicePoint = async (servicePointId) => {
     if (window.confirm(t('queue.deleteConfirm'))) {
       try {
-        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`);
         fetchServicePoints();
+      } catch (err) {
+        console.error(err);
+        alert(t('common.error'));
+      }
+    }
+  };
+
+  const deleteAllServicePoints = async () => {
+    if (window.confirm('Are you sure you want to delete ALL your service points? This action cannot be undone.')) {
+      try {
+        await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
+        fetchServicePoints();
+        alert('All service points deleted successfully.');
       } catch (err) {
         console.error(err);
         alert(t('common.error'));
@@ -144,6 +147,9 @@ const StaffDashboard = ({ user }) => {
       </div>
       <div className="service-points">
         <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
+        {servicePoints.length > 0 && (
+          <button className="btn-delete-all" onClick={deleteAllServicePoints}>Delete All Service Points</button>
+        )}
         {servicePoints.map((sp) => (
           <div key={sp.id} className="service-point">
             <h3>{sp.name}</h3>

@@ -6,11 +6,19 @@ const UserDashboard = ({ user }) => {
   const { t } = useTranslation();
   const [servicePoints, setServicePoints] = useState([]);
   const [myQueue, setMyQueue] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [error, setError] = useState(null);
   const wsRefs = useRef({});
+
+  const getAuthToken = () => {
+    // Token is now handled via HTTP-only cookies
+    return null;
+  };
 
   useEffect(() => {
     fetchServicePoints();
     fetchMyQueue();
+    fetchNotifications();
   }, []);
 
   useEffect(() => {
@@ -23,6 +31,11 @@ const UserDashboard = ({ user }) => {
             setServicePoints(prev => prev.filter(s => s.id !== sp.id));
           } else if (data.queue_length !== undefined) {
             setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
+          } else if (data.user_id && data.message) {
+            if (data.user_id === user.id) {
+              // Refresh notifications when a new one is received
+              fetchNotifications();
+            }
           }
         };
         wsRefs.current[sp.id] = ws;
@@ -33,13 +46,11 @@ const UserDashboard = ({ user }) => {
       Object.values(wsRefs.current).forEach(ws => ws.close());
       wsRefs.current = {};
     };
-  }, [servicePoints]);
+  }, [servicePoints, user.id]);
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/service-points/', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const response = await axios.get('http://localhost:8000/api/queues/service-points/');
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -48,41 +59,66 @@ const UserDashboard = ({ user }) => {
 
   const fetchMyQueue = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/my-position/', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
+      const response = await axios.get('http://localhost:8000/api/queues/my-position/');
       setMyQueue(response.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const joinQueue = async (servicePointId) => {
+  const fetchNotifications = async () => {
     try {
-      await axios.post('http://localhost:8000/api/queues/join/', { service_point_id: servicePointId }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-      });
-      fetchMyQueue();
+      const response = await axios.get('http://localhost:8000/api/queues/notifications/');
+      setNotifications(response.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const markNotificationRead = async (notificationId) => {
+    try {
+      await axios.post(`http://localhost:8000/api/queues/notifications/${notificationId}/mark-read/`);
+      setNotifications(prev => prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n));
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        console.error(err);
+      }
+    }
+  };
+
+  const joinQueue = async (servicePointId) => {
+    try {
+      await axios.post('http://localhost:8000/api/queues/join/', { service_point_id: servicePointId });
+      fetchMyQueue();
+    } catch (err) {
+      if (err.response && err.response.status === 401) {
+        setError('Authentication failed. Please log in again.');
+      } else {
+        console.error(err);
+      }
     }
   };
 
   const leaveQueue = async () => {
     if (myQueue) {
       try {
-        await axios.post('http://localhost:8000/api/queues/leave/', { service_point_id: myQueue.service_point.id }, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
+        await axios.post('http://localhost:8000/api/queues/leave/', { service_point_id: myQueue.service_point.id });
         setMyQueue(null);
       } catch (err) {
-        console.error(err);
+        if (err.response && err.response.status === 401) {
+          setError('Authentication failed. Please log in again.');
+        } else {
+          console.error(err);
+        }
       }
     }
   };
 
   return (
     <div className="dashboard">
+      {error && <div className="error-message">{error}</div>}
       <h2>{t('app.welcome', { username: user.username })}</h2>
       <div className="service-points">
         <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
@@ -92,7 +128,9 @@ const UserDashboard = ({ user }) => {
             <p>{sp.description || 'No description available'}</p>
             <p>Location: {sp.location || 'N/A'}</p>
             <p>Queue Length: {sp.queue_length || 0}</p>
-            <button className="btn-join" onClick={() => joinQueue(sp.id)}>{t('dashboard.joinQueue')}</button>
+            <button className="btn-join" onClick={() => joinQueue(sp.id)}>
+              {myQueue && myQueue.service_point.id === sp.id ? t('dashboard.joined') : t('dashboard.joinQueue')}
+            </button>
           </div>
         ))}
       </div>
@@ -109,6 +147,22 @@ const UserDashboard = ({ user }) => {
       {!myQueue && (
         <p className="queue-status">No active queue. Join a service point above to start.</p>
       )}
+      <div className="notifications">
+        <h3>Notifications</h3>
+        {notifications.length === 0 ? (
+          <p>No notifications.</p>
+        ) : (
+          notifications.map(notification => (
+            <div key={notification.id} className={`notification ${notification.is_read ? 'read' : 'unread'}`}>
+              <p>{notification.message}</p>
+              <small>{new Date(notification.created_at).toLocaleString()}</small>
+              {!notification.is_read && (
+                <button onClick={() => markNotificationRead(notification.id)}>Mark as Read</button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

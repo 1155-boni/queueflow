@@ -14,8 +14,7 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
       const response = await axios.post('http://localhost:8000/api/auth/login/', {
         username,
         password,
-      });
-      localStorage.setItem('token', response.data.access);
+      }, { withCredentials: true });
       onLogin(response.data.user);
     } catch (err) {
       setError(err.response?.data?.non_field_errors?.[0] || 'Invalid credentials');

@@ -9,6 +9,8 @@ from .serializers import LoginSerializer
 from queues.models import ServicePoint
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from datetime import timedelta
+from rest_framework_simplejwt.exceptions import TokenError
 
 
 @api_view(['POST'])
@@ -43,16 +45,80 @@ class CustomLoginView(TokenObtainPairView):
         serializer.is_valid(raise_exception=True)
         user = serializer.user
         refresh = RefreshToken.for_user(user)
-        return Response({
+        access_token = refresh.access_token
+
+        response = Response({
             'user': {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
                 'role': user.role
-            },
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            }
         }, status=status.HTTP_200_OK)
+
+        # Set HTTP-only cookies
+        response.set_cookie(
+            key='access_token',
+            value=str(access_token),
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite='Lax',
+            max_age=timedelta(minutes=15).total_seconds()
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite='Lax',
+            max_age=timedelta(days=7).total_seconds()
+        )
+
+        return response
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_token(request):
+    """
+    Refresh access token using refresh token from cookie.
+    """
+    refresh_token = request.COOKIES.get('refresh_token')
+    if not refresh_token:
+        return Response({'error': 'Refresh token not found'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        access_token = refresh.access_token
+
+        response = Response({'message': 'Token refreshed'}, status=status.HTTP_200_OK)
+        response.set_cookie(
+            key='access_token',
+            value=str(access_token),
+            httponly=True,
+            secure=False,  # Set to True in production with HTTPS
+            samesite='Lax',
+            max_age=timedelta(minutes=15).total_seconds()
+        )
+        return response
+    except TokenError:
+        # Clear invalid refresh token
+        response = Response({'error': 'Invalid refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
+        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token')
+        return response
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def logout(request):
+    """
+    Logout user by clearing cookies.
+    """
+    response = Response({'message': 'Logged out successfully.'}, status=status.HTTP_200_OK)
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    return response
 
 
 @api_view(['DELETE'])

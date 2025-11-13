@@ -47,4 +47,8 @@ class QueueConsumer(AsyncWebsocketConsumer):
 
     async def queue_update(self, event):
         # Broadcast queue updates
+        await self.send(text_data=json.dumps(event))
+
+    async def notification(self, event):
+        # Broadcast notification to all connected clients in the group
         await self.send(text_data=json.dumps(event['data']))

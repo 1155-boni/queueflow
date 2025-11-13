@@ -2,93 +2,149 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .models import ServicePoint, QueueEntry
-from .serializers import ServicePointSerializer, QueueEntrySerializer, JoinQueueSerializer
-from django.db.models import Q, Avg, F, Count
 from django.utils import timezone
+from django.db.models import F, Avg, Count, Max
 from datetime import timedelta
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+from .models import QueueEntry, Notification, ServicePoint
+from .serializers import ServicePointSerializer, QueueEntrySerializer, JoinQueueSerializer, NotificationSerializer
+from .tasks import send_queue_notification_email, send_queue_update
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dismiss_customer(request):
+    """
+    Staff can dismiss/serve a customer who has been called.
+    """
+    if request.user.role != 'staff':
+        return Response({'error': 'Only staff can dismiss customers.'}, status=status.HTTP_403_FORBIDDEN)
 
-def send_queue_update(service_point_id):
-    channel_layer = get_channel_layer()
-    # Calculate current queue length (waiting + called)
-    queue_length = QueueEntry.objects.filter(
-        service_point_id=service_point_id,
-        status__in=['waiting', 'called']
-    ).count()
-    async_to_sync(channel_layer.group_send)(
-        f'queue_{service_point_id}',
-        {
-            'type': 'queue_update',
-            'data': {'queue_length': queue_length}
-        }
-    )
+    queue_entry_id = request.data.get('queue_entry_id')
+    if not queue_entry_id:
+        return Response({'error': 'queue_entry_id required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        queue_entry = QueueEntry.objects.get(
+            id=queue_entry_id,
+            status='called'  # Only dismiss customers who have been called
+        )
+
+        # Check if staff owns the service point
+        if queue_entry.service_point.creator != request.user:
+            return Response({'error': 'You can only dismiss customers from your service points.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Mark as served
+        queue_entry.status = 'served'
+        queue_entry.served_at = timezone.now()
+        queue_entry.save()
+
+        # Update positions of remaining customers
+        QueueEntry.objects.filter(
+            service_point=queue_entry.service_point,
+            position__gt=queue_entry.position,
+            status='waiting'
+        ).update(position=F('position') - 1)
+
+        # Send notification to the dismissed customer
+        Notification.objects.create(
+            user=queue_entry.user,
+            message='Your service has been completed. Thank you for your patience!'
+        )
+
+        # Send email notification
+        send_queue_notification_email(
+            queue_entry.user.email,
+            'Your service has been completed. Thank you for your patience!'
+        )
+
+        send_queue_update(queue_entry.service_point.id)
+
+        return Response({'message': f'Customer {queue_entry.user.username} has been dismissed.'})
+
+    except QueueEntry.DoesNotExist:
+        return Response({'error': 'Queue entry not found or customer not in called status.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def join_queue(request):
     """
-    Allow authenticated user to join a queue at a service point.
+    Allow users to join a queue for a service point.
     """
     serializer = JoinQueueSerializer(data=request.data)
-    if serializer.is_valid():
-        service_point_id = serializer.validated_data['service_point_id']
-        service_point = ServicePoint.objects.filter(id=service_point_id, is_active=True).first()
-        if not service_point:
-            return Response({'error': 'Service point not found or inactive.'}, status=status.HTTP_404_NOT_FOUND)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if user is already in this queue
-        if QueueEntry.objects.filter(service_point=service_point, user=request.user, status='waiting').exists():
-            return Response({'error': 'You are already in this queue.'}, status=status.HTTP_400_BAD_REQUEST)
+    service_point_id = serializer.validated_data['service_point_id']
 
-        # Get current waiting count
-        waiting_count = QueueEntry.objects.filter(
-            service_point=service_point,
-            status__in=['waiting', 'called']
-        ).count()
+    try:
+        service_point = ServicePoint.objects.get(id=service_point_id, is_active=True)
+    except ServicePoint.DoesNotExist:
+        return Response({'error': 'Service point not found or inactive.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Create new entry
-        queue_entry = QueueEntry.objects.create(
-            service_point=service_point,
-            user=request.user,
-            position=waiting_count + 1,
-            estimated_wait_time=timedelta(minutes=waiting_count * 5)  # Assume 5 minutes per person
-        )
+    # Check if user is already in any queue
+    existing_entry = QueueEntry.objects.filter(
+        user=request.user,
+        status__in=['waiting', 'called']
+    ).first()
+    if existing_entry:
+        return Response({'error': 'You are already in a queue.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        send_queue_update(service_point_id)
+    # Get the next position
+    last_position = QueueEntry.objects.filter(
+        service_point=service_point,
+        status__in=['waiting', 'called']
+    ).aggregate(max_pos=Max('position'))['max_pos'] or 0
 
-        serializer = QueueEntrySerializer(queue_entry)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    position = last_position + 1
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # Create queue entry
+    queue_entry = QueueEntry.objects.create(
+        service_point=service_point,
+        user=request.user,
+        position=position
+    )
+
+    # Send notification
+    Notification.objects.create(
+        user=request.user,
+        message=f'You have joined the queue for {service_point.name}. Your position is {position}.'
+    )
+
+    send_queue_notification_email(
+        request.user.email,
+        f'You have joined the queue for {service_point.name}. Your position is {position}.'
+    )
+
+    send_queue_update(service_point.id)
+
+    return Response({
+        'message': f'Successfully joined queue for {service_point.name}.',
+        'position': position
+    })
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_queue_position(request):
     """
-    Get the user's current queue position if any.
+    Return user's current position in queue.
     """
-    queue_entry = QueueEntry.objects.filter(
-        user=request.user,
-        status__in=['waiting', 'called']
-    ).select_related('service_point').first()
-
-    if queue_entry:
+    try:
+        queue_entry = QueueEntry.objects.get(
+            user=request.user,
+            status__in=['waiting', 'called']
+        )
         serializer = QueueEntrySerializer(queue_entry)
         return Response(serializer.data)
-    else:
-        return Response({'message': 'No active queue position.'}, status=status.HTTP_200_OK)
+    except QueueEntry.DoesNotExist:
+        return Response({'error': 'You are not in any queue.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def service_points(request):
     """
-    List active service points. For staff, only their own; for customers, all active.
+    List active service points. Staff see only their own, users see all.
     """
     if request.user.role == 'staff':
         service_points = ServicePoint.objects.filter(is_active=True, creator=request.user)
@@ -102,7 +158,7 @@ def service_points(request):
 @permission_classes([IsAuthenticated])
 def create_service_point(request):
     """
-    Staff can create a new service point.
+    Staff can create service points.
     """
     if request.user.role != 'staff':
         return Response({'error': 'Only staff can create service points.'}, status=status.HTTP_403_FORBIDDEN)
@@ -118,116 +174,171 @@ def create_service_point(request):
 @permission_classes([IsAuthenticated])
 def delete_service_point(request, service_point_id):
     """
-    Staff can delete a service point.
+    Staff can delete their own service points, regardless of queue status.
     """
     if request.user.role != 'staff':
         return Response({'error': 'Only staff can delete service points.'}, status=status.HTTP_403_FORBIDDEN)
 
     try:
         service_point = ServicePoint.objects.get(id=service_point_id, creator=request.user)
-        service_point.is_active = False
-        service_point.save()
-        # Notify connected clients that the service point is deleted
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f'queue_{service_point_id}',
-            {
-                'type': 'queue_update',
-                'data': {'deleted': True}
-            }
-        )
-        return Response({'message': 'Service point deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
     except ServicePoint.DoesNotExist:
-        return Response({'error': 'Service point not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': 'Service point not found or you do not own it.'}, status=status.HTTP_404_NOT_FOUND)
+
+    service_point.delete()
+    return Response({'message': 'Service point deleted successfully.'})
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_all_service_points(request):
+    """
+    Staff can delete all their service points, regardless of queue status.
+    """
+    if request.user.role != 'staff':
+        return Response({'error': 'Only staff can delete service points.'}, status=status.HTTP_403_FORBIDDEN)
+
+    deleted_count, _ = ServicePoint.objects.filter(creator=request.user).delete()
+    return Response({'message': f'Successfully deleted {deleted_count} service points.'})
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def call_next(request):
     """
-    Staff calls the next person in the queue for a service point.
+    Staff call next customer in queue.
     """
     if request.user.role != 'staff':
-        return Response({'error': 'Only staff can call next.'}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'error': 'Only staff can call next customer.'}, status=status.HTTP_403_FORBIDDEN)
 
-    service_point_id = request.data.get('service_point_id')
-    if not service_point_id:
-        return Response({'error': 'service_point_id required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    service_point = ServicePoint.objects.filter(id=service_point_id, is_active=True).first()
-    if not service_point:
-        return Response({'error': 'Service point not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-    # Find the next waiting entry
-    next_entry = QueueEntry.objects.filter(
-        service_point=service_point,
-        status='waiting'
-    ).order_by('position').first()
-
-    if next_entry:
-        next_entry.status = 'called'
-        next_entry.called_at = timezone.now()
-        next_entry.save()
-        send_queue_update(service_point_id)
-        serializer = QueueEntrySerializer(next_entry)
-        return Response(serializer.data)
-    else:
-        return Response({'message': 'No one in queue.'}, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def leave_queue(request):
-    """
-    Allow user to leave the queue.
-    """
-    service_point_id = request.data.get('service_point_id')
-    if not service_point_id:
-        return Response({'error': 'service_point_id required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    queue_entry = QueueEntry.objects.filter(
-        service_point_id=service_point_id,
-        user=request.user,
-        status__in=['waiting', 'called']
-    ).first()
-
-    if queue_entry:
-        queue_entry.status = 'left'
-        queue_entry.save()
-        # Update positions of others
-        QueueEntry.objects.filter(
-            service_point_id=service_point_id,
-            position__gt=queue_entry.position,
+    # Find the next waiting customer for any of the staff's service points
+    try:
+        queue_entry = QueueEntry.objects.filter(
+            service_point__creator=request.user,
             status='waiting'
-        ).update(position=F('position') - 1)
-        send_queue_update(service_point_id)
-        return Response({'message': 'Left the queue.'})
-    else:
-        return Response({'error': 'Not in queue.'}, status=status.HTTP_400_BAD_REQUEST)
+        ).order_by('position').first()
+
+        if not queue_entry:
+            return Response({'error': 'No customers waiting in your queues.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Mark as called
+        queue_entry.status = 'called'
+        queue_entry.called_at = timezone.now()
+        queue_entry.save()
+
+        # Send notification
+        Notification.objects.create(
+            user=queue_entry.user,
+            message=f'Your turn! Please proceed to {queue_entry.service_point.name}.'
+        )
+
+        send_queue_notification_email(
+            queue_entry.user.email,
+            f'Your turn! Please proceed to {queue_entry.service_point.name}.'
+        )
+
+        send_queue_update(queue_entry.service_point.id)
+
+        serializer = QueueEntrySerializer(queue_entry)
+        return Response(serializer.data)
+
+    except QueueEntry.DoesNotExist:
+        return Response({'error': 'No customers waiting.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def analytics(request):
     """
-    Get analytics for staff: average wait times, busiest hours, etc.
+    Provide queue analytics.
     """
     if request.user.role != 'staff':
         return Response({'error': 'Only staff can view analytics.'}, status=status.HTTP_403_FORBIDDEN)
 
-    # Simple analytics
-    total_entries = QueueEntry.objects.count()
-    avg_wait_time = QueueEntry.objects.filter(called_at__isnull=False).aggregate(
-        avg_wait=Avg(F('called_at') - F('joined_at'))
+    # Get analytics for staff's service points
+    service_points = ServicePoint.objects.filter(creator=request.user)
+
+    total_served = QueueEntry.objects.filter(
+        service_point__in=service_points,
+        status='served'
+    ).count()
+
+    # Average wait time (from join to served)
+    avg_wait_time = QueueEntry.objects.filter(
+        service_point__in=service_points,
+        status='served',
+        served_at__isnull=False
+    ).aggregate(
+        avg_wait=Avg(F('served_at') - F('joined_at'))
     )['avg_wait']
 
-    # Busiest hours (simplified)
-    busiest_hour = QueueEntry.objects.extra(
-        select={'hour': 'extract(hour from joined_at)'}
-    ).values('hour').annotate(count=Count('id')).order_by('-count').first()
+    # Current queue lengths
+    current_queues = []
+    for sp in service_points:
+        length = sp.queue_entries.filter(status__in=['waiting', 'called']).count()
+        current_queues.append({
+            'service_point': sp.name,
+            'queue_length': length
+        })
 
     return Response({
-        'total_entries': total_entries,
-        'average_wait_time_seconds': avg_wait_time.total_seconds() if avg_wait_time else 0,
-        'busiest_hour': busiest_hour['hour'] if busiest_hour else None,
+        'total_served': total_served,
+        'average_wait_time_seconds': avg_wait_time.total_seconds() if avg_wait_time else None,
+        'current_queues': current_queues
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def leave_queue(request):
+    """
+    Allow users to leave queue.
+    """
+    try:
+        queue_entry = QueueEntry.objects.get(
+            user=request.user,
+            status__in=['waiting', 'called']
+        )
+
+        # Mark as abandoned
+        queue_entry.status = 'abandoned'
+        queue_entry.save()
+
+        # Update positions of remaining customers
+        QueueEntry.objects.filter(
+            service_point=queue_entry.service_point,
+            position__gt=queue_entry.position,
+            status='waiting'
+        ).update(position=F('position') - 1)
+
+        send_queue_update(queue_entry.service_point.id)
+
+        return Response({'message': 'Successfully left the queue.'})
+
+    except QueueEntry.DoesNotExist:
+        return Response({'error': 'You are not in any queue.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def notifications(request):
+    """
+    Get user's notifications.
+    """
+    notifications = Notification.objects.filter(user=request.user)
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    """
+    Mark notification as read.
+    """
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.is_read = True
+        notification.save()
+        return Response({'message': 'Notification marked as read.'})
+    except Notification.DoesNotExist:
+        return Response({'error': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)

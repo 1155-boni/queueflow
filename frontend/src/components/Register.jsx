@@ -19,7 +19,6 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
         password,
         role,
       });
-      localStorage.setItem('token', response.data.access);
       onRegister(response.data.user);
     } catch (err) {
       setError(err.response?.data?.username?.[0] || err.response?.data?.non_field_errors?.[0] || 'Registration failed');

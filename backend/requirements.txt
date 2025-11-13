@@ -8,3 +8,4 @@ psycopg2-binary
 whitenoise
 python-dotenv
 djangorestframework-simplejwt
+django-anymail[mailgun]

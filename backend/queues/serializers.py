@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ServicePoint, QueueEntry
+from .models import ServicePoint, QueueEntry, Notification
 from accounts.models import User
 
 
@@ -32,3 +32,10 @@ class QueueEntrySerializer(serializers.ModelSerializer):
 
 class JoinQueueSerializer(serializers.Serializer):
     service_point_id = serializers.IntegerField()
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ('id', 'message', 'created_at', 'is_read')
+        read_only_fields = ('id', 'created_at')
