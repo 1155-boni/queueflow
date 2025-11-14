@@ -6,6 +6,7 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   const { t, i18n } = useTranslation();
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     document.body.className = theme;
@@ -23,16 +24,23 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
     i18n.changeLanguage(selectedLanguage);
   };
 
-  const handleDeleteAccount = async () => {
-    // Remove confirmation prompt - proceed directly with deletion
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteAccount = async () => {
     try {
       await axios.delete('http://localhost:8000/api/auth/delete-user/');
       onDeleteAccount();
     } catch (err) {
       console.error(err);
-      // Show error message instead of alert
       console.error(t('messages.deleteAccountError'));
     }
+    setShowDeleteConfirm(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -61,8 +69,22 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
         <button onClick={onLogout} className="btn-logout">{t('settings.logout')}</button>
       </div>
       <div className="setting-group">
-        <button onClick={handleDeleteAccount} className="btn-delete">{t('settings.deleteAccount')}</button>
+        <button onClick={handleDeleteClick} className="btn-delete">{t('settings.deleteAccount')}</button>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>{t('settings.confirmDelete')}</h3>
+            <p>{t('common.confirmMessage')}</p>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
+              <button className="btn-confirm" onClick={confirmDeleteAccount}>{t('common.confirm')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

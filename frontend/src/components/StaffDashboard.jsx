@@ -12,6 +12,9 @@ const StaffDashboard = ({ user }) => {
     location: '',
     is_active: true,
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteServicePointId, setDeleteServicePointId] = useState(null);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
   const wsRefs = useRef({});
 
   useEffect(() => {
@@ -81,32 +84,46 @@ const StaffDashboard = ({ user }) => {
     }
   };
 
-  const deleteServicePoint = async (servicePointId) => {
-    // Remove confirmation prompt - proceed directly with deletion
-    try {
-      await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`);
-      fetchServicePoints();
-      // Show success message instead of alert
-      console.log(t('queue.deleteSuccess'));
-    } catch (err) {
-      console.error(err);
-      // Show error message instead of alert
-      console.error(t('messages.deleteServicePointError'));
-    }
+  const handleDeleteClick = (servicePointId) => {
+    setDeleteServicePointId(servicePointId);
+    setShowDeleteConfirm(true);
   };
 
-  const deleteAllServicePoints = async () => {
-    // Remove confirmation prompt - proceed directly with deletion
+  const handleDeleteAllClick = () => {
+    setShowDeleteAllConfirm(true);
+  };
+
+  const confirmDeleteServicePoint = async () => {
+    if (deleteServicePointId) {
+      try {
+        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`);
+        fetchServicePoints();
+        console.log(t('queue.deleteSuccess'));
+      } catch (err) {
+        console.error(err);
+        console.error(t('messages.deleteServicePointError'));
+      }
+    }
+    setShowDeleteConfirm(false);
+    setDeleteServicePointId(null);
+  };
+
+  const confirmDeleteAllServicePoints = async () => {
     try {
       await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
       fetchServicePoints();
-      // Show success message instead of alert
       console.log(t('messages.deleteAllSuccess'));
     } catch (err) {
       console.error(err);
-      // Show error message instead of alert
       console.error(t('messages.deleteAllError'));
     }
+    setShowDeleteAllConfirm(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteServicePointId(null);
+    setShowDeleteAllConfirm(false);
   };
 
   return (
@@ -151,7 +168,7 @@ const StaffDashboard = ({ user }) => {
       <div className="service-points">
         <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
         {servicePoints.length > 0 && (
-          <button className="btn-delete-all" onClick={deleteAllServicePoints}>Delete All Service Points</button>
+          <button className="btn-delete-all" onClick={handleDeleteAllClick}>Delete All Service Points</button>
         )}
         {servicePoints.map((sp) => (
           <div key={sp.id} className="service-point">
@@ -161,9 +178,37 @@ const StaffDashboard = ({ user }) => {
             <p>Active: {sp.is_active ? 'Yes' : 'No'}</p>
             <p>{t('staff.queueLength', { length: sp.queue_length || 0 })}</p>
             <button className="btn-call" onClick={() => callNext(sp.id)}>{t('dashboard.callNext')}</button>
-            <button className="btn-delete" onClick={() => deleteServicePoint(sp.id)}>{t('dashboard.delete')}</button>
+            <button className="btn-delete" onClick={() => handleDeleteClick(sp.id)}>{t('dashboard.delete')}</button>
           </div>
         ))}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>{t('queue.deleteConfirm')}</h3>
+              <p>{t('common.confirmMessage')}</p>
+              <div className="modal-actions">
+                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
+                <button className="btn-confirm" onClick={confirmDeleteServicePoint}>{t('common.confirm')}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete All Confirmation Modal */}
+        {showDeleteAllConfirm && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>Delete All Service Points</h3>
+              <p>Are you sure you want to delete ALL your service points? This action cannot be undone.</p>
+              <div className="modal-actions">
+                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
+                <button className="btn-confirm" onClick={confirmDeleteAllServicePoints}>{t('common.confirm')}</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <div className="analytics">
         <h3>{t('dashboard.analytics')} <span className="realtime">{t('common.realtime')}</span></h3>

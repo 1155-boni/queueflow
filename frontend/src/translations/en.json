@@ -67,7 +67,10 @@
     "name": "Name",
     "description": "Description",
     "location": "Location",
-    "active": "Active"
+    "active": "Active",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "confirmMessage": "This action cannot be undone. Are you sure you want to proceed?"
   },
   "messages": {
     "deleteAllSuccess": "All service points deleted successfully.",
