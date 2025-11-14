@@ -69,6 +69,12 @@
     "location": "Location",
     "active": "Active"
   },
+  "messages": {
+    "deleteAllSuccess": "All service points deleted successfully.",
+    "deleteAllError": "Failed to delete all service points. Please try again.",
+    "deleteServicePointError": "Failed to delete service point. Please try again.",
+    "deleteAccountError": "Failed to delete account. Please try again."
+  },
   "queue": {
     "joinSuccess": "Joined queue successfully!",
     "leaveSuccess": "Left queue successfully!",

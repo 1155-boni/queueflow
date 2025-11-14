@@ -30,7 +30,8 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
         onDeleteAccount();
       } catch (err) {
         console.error(err);
-        alert(t('common.error'));
+        // Show error message instead of alert
+        console.error(t('messages.deleteAccountError'));
       }
     }
   };

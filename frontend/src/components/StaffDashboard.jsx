@@ -86,9 +86,12 @@ const StaffDashboard = ({ user }) => {
       try {
         await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`);
         fetchServicePoints();
+        // Show success message instead of alert
+        console.log(t('queue.deleteSuccess'));
       } catch (err) {
         console.error(err);
-        alert(t('common.error'));
+        // Show error message instead of alert
+        console.error(t('messages.deleteServicePointError'));
       }
     }
   };
@@ -98,10 +101,12 @@ const StaffDashboard = ({ user }) => {
       try {
         await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
         fetchServicePoints();
-        alert('All service points deleted successfully.');
+        // Show success message instead of alert
+        console.log(t('messages.deleteAllSuccess'));
       } catch (err) {
         console.error(err);
-        alert(t('common.error'));
+        // Show error message instead of alert
+        console.error(t('messages.deleteAllError'));
       }
     }
   };
