@@ -24,15 +24,14 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   };
 
   const handleDeleteAccount = async () => {
-    if (window.confirm(t('settings.confirmDelete'))) {
-      try {
-        await axios.delete('http://localhost:8000/api/auth/delete-user/');
-        onDeleteAccount();
-      } catch (err) {
-        console.error(err);
-        // Show error message instead of alert
-        console.error(t('messages.deleteAccountError'));
-      }
+    // Remove confirmation prompt - proceed directly with deletion
+    try {
+      await axios.delete('http://localhost:8000/api/auth/delete-user/');
+      onDeleteAccount();
+    } catch (err) {
+      console.error(err);
+      // Show error message instead of alert
+      console.error(t('messages.deleteAccountError'));
     }
   };
 

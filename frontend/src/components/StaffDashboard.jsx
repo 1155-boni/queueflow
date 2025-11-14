@@ -82,32 +82,30 @@ const StaffDashboard = ({ user }) => {
   };
 
   const deleteServicePoint = async (servicePointId) => {
-    if (window.confirm(t('queue.deleteConfirm'))) {
-      try {
-        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`);
-        fetchServicePoints();
-        // Show success message instead of alert
-        console.log(t('queue.deleteSuccess'));
-      } catch (err) {
-        console.error(err);
-        // Show error message instead of alert
-        console.error(t('messages.deleteServicePointError'));
-      }
+    // Remove confirmation prompt - proceed directly with deletion
+    try {
+      await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${servicePointId}/`);
+      fetchServicePoints();
+      // Show success message instead of alert
+      console.log(t('queue.deleteSuccess'));
+    } catch (err) {
+      console.error(err);
+      // Show error message instead of alert
+      console.error(t('messages.deleteServicePointError'));
     }
   };
 
   const deleteAllServicePoints = async () => {
-    if (window.confirm('Are you sure you want to delete ALL your service points? This action cannot be undone.')) {
-      try {
-        await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
-        fetchServicePoints();
-        // Show success message instead of alert
-        console.log(t('messages.deleteAllSuccess'));
-      } catch (err) {
-        console.error(err);
-        // Show error message instead of alert
-        console.error(t('messages.deleteAllError'));
-      }
+    // Remove confirmation prompt - proceed directly with deletion
+    try {
+      await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
+      fetchServicePoints();
+      // Show success message instead of alert
+      console.log(t('messages.deleteAllSuccess'));
+    } catch (err) {
+      console.error(err);
+      // Show error message instead of alert
+      console.error(t('messages.deleteAllError'));
     }
   };
 
