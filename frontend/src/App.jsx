@@ -26,7 +26,7 @@ function App() {
         const accessToken = document.cookie.split(';').find(c => c.trim().startsWith('access_token='));
         if (!accessToken) {
           setUser(null);
-          setView('login');
+          // Keep landing page as default view for unauthenticated users
           return;
         }
 
@@ -43,9 +43,9 @@ function App() {
           setUser(response.data);
           setView('dashboard');
         } catch (refreshError) {
-          // If refresh fails, user is not authenticated
+          // If refresh fails, user is not authenticated - keep landing page
           setUser(null);
-          setView('login');
+          // Keep landing page as default view
         }
       }
     };
