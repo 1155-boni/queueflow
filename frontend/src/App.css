@@ -982,32 +982,109 @@ body.dark .setting-group select:focus {
   box-shadow: 0 6px 20px rgba(197, 48, 48, 0.3);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .dashboard {
-    padding: 1.5rem;
-  }
+/* Bank Features Cards */
+.bank-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
 
-  .service-points {
+.feature-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08), 0 0 0 1px rgba(255,255,255,0.1);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+body.dark .feature-card {
+  background: rgba(45, 55, 72, 0.95);
+  border: 1px solid rgba(74, 85, 104, 0.3);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 0 1px rgba(74, 85, 104, 0.1);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #7CC142, #FFFFFF);
+}
+
+body.dark .feature-card::before {
+  background: linear-gradient(90deg, #68d391, #4a5568);
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  border-color: #4f46e5;
+}
+
+body.dark .feature-card:hover {
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  border-color: #68d391;
+}
+
+.feature-card h3 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+body.dark .feature-card h3 {
+  color: #e2e8f0;
+}
+
+.feature-card p {
+  color: #4a5568;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+body.dark .feature-card p {
+  color: #cbd5e0;
+}
+
+/* Government Features Cards */
+.government-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+/* Hospital Features Cards */
+.hospital-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+/* Responsive Design for All Features */
+@media (max-width: 768px) {
+  .bank-features,
+  .government-features,
+  .hospital-features {
     grid-template-columns: 1fr;
   }
 
-  .form-container {
-    padding: 2rem;
-    margin: 1rem;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .queue-status strong {
-    font-size: 2.5rem;
-  }
-
-  .settings {
+  .feature-card {
     padding: 1.5rem;
-    margin: 1rem;
   }
 }

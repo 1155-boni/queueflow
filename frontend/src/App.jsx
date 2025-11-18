@@ -5,6 +5,9 @@ import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
 import StaffDashboard from './components/StaffDashboard.jsx';
+import BankDashboard from './components/BankDashboard.jsx';
+import GovernmentDashboard from './components/GovernmentDashboard.jsx';
+import HospitalDashboard from './components/HospitalDashboard.jsx';
 import Settings from './components/Settings.jsx';
 
 // Configure axios to send credentials with all requests
@@ -18,16 +21,31 @@ function App() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        // Try to make a simple authenticated request to check if user is logged in
-        await axios.get('http://localhost:8000/api/queues/service-points/');
-        // If successful, user is authenticated, but we don't have user data
-        // This is a problem - we need to get user data or redirect to login
-        setUser(null); // Force login since we don't have user data
-        setView('login');
+        // Check if we have access token in cookies
+        const accessToken = document.cookie.split(';').find(c => c.trim().startsWith('access_token='));
+        if (!accessToken) {
+          setUser(null);
+          setView('login');
+          return;
+        }
+
+        // Try to get user profile or make authenticated request
+        const response = await axios.get('http://localhost:8000/api/auth/profile/', { withCredentials: true });
+        setUser(response.data);
+        setView('dashboard');
       } catch (error) {
-        // If 401, user is not authenticated
-        setUser(null);
-        setView('login');
+        // If token is invalid or expired, try to refresh
+        try {
+          await axios.post('http://localhost:8000/api/auth/refresh/', {}, { withCredentials: true });
+          // If refresh successful, retry the profile request
+          const response = await axios.get('http://localhost:8000/api/auth/profile/', { withCredentials: true });
+          setUser(response.data);
+          setView('dashboard');
+        } catch (refreshError) {
+          // If refresh fails, user is not authenticated
+          setUser(null);
+          setView('login');
+        }
       }
     };
 
@@ -70,7 +88,7 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>KCB QueueFlow - The Pride of Africa</h1>
+        <h1>LineHub - The Hub of Effortless Service</h1>
         {user && (
           <nav>
             <span>Welcome, {user.username}</span>
@@ -91,6 +109,12 @@ function App() {
           <div>
             {user.role === 'customer' ? (
               <UserDashboard user={user} />
+            ) : user.organization_type === 'bank' ? (
+              <BankDashboard user={user} />
+            ) : user.organization_type === 'government' ? (
+              <GovernmentDashboard user={user} />
+            ) : user.organization_type === 'hospital' ? (
+              <HospitalDashboard user={user} />
             ) : (
               <StaffDashboard user={user} />
             )}

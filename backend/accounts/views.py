@@ -28,7 +28,8 @@ def register(request):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'role': user.role
+                'role': user.role,
+                'organization_type': user.organization_type
             },
             'refresh': str(refresh),
             'access': str(refresh.access_token),
@@ -52,7 +53,8 @@ class CustomLoginView(TokenObtainPairView):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'role': user.role
+                'role': user.role,
+                'organization_type': user.organization_type
             }
         }, status=status.HTTP_200_OK)
 
@@ -107,6 +109,22 @@ def refresh_token(request):
         response.delete_cookie('refresh_token')
         response.delete_cookie('access_token')
         return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    """
+    Get user profile information.
+    """
+    user = request.user
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'role': user.role,
+        'organization_type': user.organization_type
+    })
 
 
 @api_view(['POST'])

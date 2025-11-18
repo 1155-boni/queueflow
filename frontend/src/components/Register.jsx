@@ -8,6 +8,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('customer');
+  const [organizationType, setOrganizationType] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
@@ -18,6 +19,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
         email,
         password,
         role,
+        organization_type: role === 'staff' ? organizationType : undefined,
       });
       onRegister(response.data.user);
     } catch (err) {
@@ -72,6 +74,17 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
             <option value="staff">Staff</option>
           </select>
         </div>
+        {role === 'staff' && (
+          <div className="form-group">
+            <label htmlFor="organizationType">Organization Type</label>
+            <select id="organizationType" value={organizationType} onChange={(e) => setOrganizationType(e.target.value)} required>
+              <option value="">Select Organization Type</option>
+              <option value="bank">Bank</option>
+              <option value="government">Government Official</option>
+              <option value="hospital">Hospital</option>
+            </select>
+          </div>
+        )}
         <button type="submit">{t('register.submit')}</button>
       </form>
       {error && <p className="error">{error}</p>}

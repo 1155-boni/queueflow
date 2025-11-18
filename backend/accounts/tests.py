@@ -14,8 +14,25 @@ class AuthTests(APITestCase):
             username='testuser',
             email='test@example.com',
             password='testpass123',
-            role='customer'
+            role='customer',
+            organization_type='bank'
         )
+
+    def test_register_with_organization_type(self):
+        """Test user registration with organization_type"""
+        url = reverse('register')
+        data = {
+            'username': 'newuser',
+            'email': 'new@example.com',
+            'password': 'newpass123',
+            'role': 'customer',
+            'organization_type': 'hospital'
+        }
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('user', response.data)
+        self.assertEqual(response.data['user']['organization_type'], 'hospital')
 
     def test_login_success(self):
         """Test successful login returns tokens in cookies"""
@@ -62,9 +79,13 @@ class AuthTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn('error', response.data)
-        # Check that cookies are cleared
-        self.assertFalse(response.cookies.get('access_token'))
-        self.assertFalse(response.cookies.get('refresh_token'))
+        # Check that cookies are set to empty values (deleted)
+        access_cookie = response.cookies.get('access_token')
+        refresh_cookie = response.cookies.get('refresh_token')
+        self.assertIsNotNone(access_cookie)
+        self.assertIsNotNone(refresh_cookie)
+        self.assertEqual(access_cookie.value, '')
+        self.assertEqual(refresh_cookie.value, '')
 
     def test_logout_clears_cookies(self):
         """Test logout clears cookies"""
@@ -78,5 +99,10 @@ class AuthTests(APITestCase):
         response = self.client.post(logout_url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertFalse(response.cookies.get('access_token'))
-        self.assertFalse(response.cookies.get('refresh_token'))
+        # Check that cookies are set to empty values (deleted)
+        access_cookie = response.cookies.get('access_token')
+        refresh_cookie = response.cookies.get('refresh_token')
+        self.assertIsNotNone(access_cookie)
+        self.assertIsNotNone(refresh_cookie)
+        self.assertEqual(access_cookie.value, '')
+        self.assertEqual(refresh_cookie.value, '')
