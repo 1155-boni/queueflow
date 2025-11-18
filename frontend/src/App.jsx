@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
+import LandingPage from './components/LandingPage.jsx';
 import Login from './components/Login.jsx';
 import Register from './components/Register.jsx';
 import UserDashboard from './components/UserDashboard.jsx';
@@ -15,7 +16,7 @@ axios.defaults.withCredentials = true;
 
 function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState('login');
+  const [view, setView] = useState('landing');
 
   // Check authentication status on app load
   useEffect(() => {
@@ -98,7 +99,9 @@ function App() {
       </header>
       <main>
         {!user ? (
-          view === 'login' ? (
+          view === 'landing' ? (
+            <LandingPage onSwitchToLogin={() => setView('login')} onSwitchToRegister={() => setView('register')} />
+          ) : view === 'login' ? (
             <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />
           ) : (
             <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />
