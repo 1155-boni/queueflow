@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 const BankDashboard = ({ user }) => {
   const { t } = useTranslation();
   const [servicePoints, setServicePoints] = useState([]);
   const [analytics, setAnalytics] = useState({});
   const [newServicePoint, setNewServicePoint] = useState({
-    name: '',
-    description: '',
-    bank_name: '',
-    branch: '',
-    location: '',
-    directions: '',
+    name: "",
+    description: "",
+    bank_name: "",
+    branch: "",
+    location: "",
+    directions: "",
     latitude: null,
     longitude: null,
     is_active: true,
@@ -28,13 +28,17 @@ const BankDashboard = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    servicePoints.forEach(sp => {
+    servicePoints.forEach((sp) => {
       if (!wsRefs.current[sp.id]) {
         const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.queue_length !== undefined) {
-            setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
+            setServicePoints((prev) =>
+              prev.map((s) =>
+                s.id === sp.id ? { ...s, queue_length: data.queue_length } : s
+              )
+            );
           }
         };
         wsRefs.current[sp.id] = ws;
@@ -42,14 +46,16 @@ const BankDashboard = ({ user }) => {
     });
 
     return () => {
-      Object.values(wsRefs.current).forEach(ws => ws.close());
+      Object.values(wsRefs.current).forEach((ws) => ws.close());
       wsRefs.current = {};
     };
   }, [servicePoints]);
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/service-points/');
+      const response = await axios.get(
+        "http://localhost:8000/api/queues/service-points/"
+      );
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -58,7 +64,9 @@ const BankDashboard = ({ user }) => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/analytics/');
+      const response = await axios.get(
+        "http://localhost:8000/api/queues/analytics/"
+      );
       setAnalytics(response.data);
     } catch (err) {
       console.error(err);
@@ -67,15 +75,18 @@ const BankDashboard = ({ user }) => {
 
   const createServicePoint = async () => {
     try {
-      await axios.post('http://localhost:8000/api/queues/create-service-point/', newServicePoint);
+      await axios.post(
+        "http://localhost:8000/api/queues/create-service-point/",
+        newServicePoint
+      );
       setNewServicePoint({
-        name: '',
-        description: '',
-        bank_name: '',
-        branch: '',
-        location: '',
-        directions: '',
-        teller_no: '',
+        name: "",
+        description: "",
+        bank_name: "",
+        branch: "",
+        location: "",
+        directions: "",
+        teller_no: "",
         is_active: true,
       });
       fetchServicePoints();
@@ -86,7 +97,9 @@ const BankDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post('http://localhost:8000/api/queues/call-next/', { service_point_id: servicePointId });
+      await axios.post("http://localhost:8000/api/queues/call-next/", {
+        service_point_id: servicePointId,
+      });
       fetchServicePoints();
     } catch (err) {
       console.error(err);
@@ -105,12 +118,14 @@ const BankDashboard = ({ user }) => {
   const confirmDeleteServicePoint = async () => {
     if (deleteServicePointId) {
       try {
-        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`);
+        await axios.delete(
+          `http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`
+        );
         fetchServicePoints();
-        console.log(t('queue.deleteSuccess'));
+        console.log(t("queue.deleteSuccess"));
       } catch (err) {
         console.error(err);
-        console.error(t('messages.deleteServicePointError'));
+        console.error(t("messages.deleteServicePointError"));
       }
     }
     setShowDeleteConfirm(false);
@@ -119,12 +134,14 @@ const BankDashboard = ({ user }) => {
 
   const confirmDeleteAllServicePoints = async () => {
     try {
-      await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
+      await axios.delete(
+        "http://localhost:8000/api/queues/delete-all-service-points/"
+      );
       fetchServicePoints();
-      console.log(t('messages.deleteAllSuccess'));
+      console.log(t("messages.deleteAllSuccess"));
     } catch (err) {
       console.error(err);
-      console.error(t('messages.deleteAllError'));
+      console.error(t("messages.deleteAllError"));
     }
     setShowDeleteAllConfirm(false);
   };
@@ -137,15 +154,21 @@ const BankDashboard = ({ user }) => {
 
   return (
     <div className="dashboard bank-dashboard">
-      <h2>{t('app.welcome', { username: user.username })} - Bank Staff</h2>
+      <h2>{t("app.welcome", { username: user.username })} - Bank Staff</h2>
       <div className="bank-features">
         <div className="feature-card">
           <h3>🏦 Banking Services</h3>
-          <p>Manage customer queues for account opening, loans, and general banking inquiries</p>
+          <p>
+            Manage customer queues for account opening, loans, and general
+            banking inquiries
+          </p>
         </div>
         <div className="feature-card">
           <h3>💰 Financial Transactions</h3>
-          <p>Handle deposits, withdrawals, and other financial operations efficiently</p>
+          <p>
+            Handle deposits, withdrawals, and other financial operations
+            efficiently
+          </p>
         </div>
         <div className="feature-card">
           <h3>📊 Customer Analytics</h3>
@@ -153,21 +176,28 @@ const BankDashboard = ({ user }) => {
         </div>
       </div>
       <div className="form-group">
-        <h3>{t('staff.createServicePoint')}</h3>
-        <label htmlFor="name">{t('common.name')}</label>
+        <h3>{t("staff.createServicePoint")}</h3>
+        <label htmlFor="name">{t("common.name")}</label>
         <input
           id="name"
           type="text"
-          placeholder={t('common.name')}
+          placeholder={t("common.name")}
           value={newServicePoint.name}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, name: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, name: e.target.value })
+          }
         />
-        <label htmlFor="description">{t('common.description')}</label>
+        <label htmlFor="description">{t("common.description")}</label>
         <textarea
           id="description"
-          placeholder={t('common.description')}
+          placeholder={t("common.description")}
           value={newServicePoint.description}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, description: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({
+              ...newServicePoint,
+              description: e.target.value,
+            })
+          }
         />
         <label htmlFor="bank_name">Bank Name</label>
         <input
@@ -175,7 +205,12 @@ const BankDashboard = ({ user }) => {
           type="text"
           placeholder="Bank Name"
           value={newServicePoint.bank_name}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, bank_name: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({
+              ...newServicePoint,
+              bank_name: e.target.value,
+            })
+          }
         />
         <label htmlFor="branch">Branch</label>
         <input
@@ -183,56 +218,89 @@ const BankDashboard = ({ user }) => {
           type="text"
           placeholder="Branch"
           value={newServicePoint.branch}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, branch: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, branch: e.target.value })
+          }
         />
-        <label htmlFor="location">{t('common.location')}</label>
+        <label htmlFor="location">{t("common.location")}</label>
         <input
           id="location"
           type="text"
-          placeholder={t('common.location')}
+          placeholder={t("common.location")}
           value={newServicePoint.location}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, location: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, location: e.target.value })
+          }
         />
         <label htmlFor="directions">Directions</label>
         <textarea
           id="directions"
           placeholder="Enter directions to the location"
           value={newServicePoint.directions}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, directions: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({
+              ...newServicePoint,
+              directions: e.target.value,
+            })
+          }
         />
         <label htmlFor="teller_no">Teller No</label>
         <input
           id="teller_no"
           type="text"
           placeholder="Teller Number"
-          value={newServicePoint.teller_no || ''}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, teller_no: e.target.value })}
+          value={newServicePoint.teller_no || ""}
+          onChange={(e) =>
+            setNewServicePoint({
+              ...newServicePoint,
+              teller_no: e.target.value,
+            })
+          }
         />
         <label htmlFor="is_active">
           <input
             id="is_active"
             type="checkbox"
             checked={newServicePoint.is_active}
-            onChange={(e) => setNewServicePoint({ ...newServicePoint, is_active: e.target.checked })}
+            onChange={(e) =>
+              setNewServicePoint({
+                ...newServicePoint,
+                is_active: e.target.checked,
+              })
+            }
           />
-          {t('common.active')}
+          {t("common.active")}
         </label>
-        <button className="btn-primary" onClick={createServicePoint}>{t('staff.createServicePoint')}</button>
+        <button className="btn-primary" onClick={createServicePoint}>
+          {t("staff.createServicePoint")}
+        </button>
       </div>
       <div className="service-points">
-        <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
+        <h3>
+          {t("dashboard.servicePoints")}{" "}
+          <span className="realtime">{t("common.realtime")}</span>
+        </h3>
         {servicePoints.length > 0 && (
-          <button className="btn-delete-all" onClick={handleDeleteAllClick}>Delete All Service Points</button>
+          <button className="btn-delete-all" onClick={handleDeleteAllClick}>
+            Delete All Service Points
+          </button>
         )}
         {servicePoints.map((sp) => (
           <div key={sp.id} className="service-card">
             <h3>{sp.name}</h3>
-            <p>{sp.description || 'No description available'}</p>
-            <p>Location: {sp.location || 'N/A'}</p>
-            <p>Active: {sp.is_active ? 'Yes' : 'No'}</p>
-            <p>{t('staff.queueLength', { length: sp.queue_length || 0 })}</p>
-            <button className="btn-call" onClick={() => callNext(sp.id)}>{t('dashboard.callNext')}</button>
-            <button className="btn-delete" onClick={() => handleDeleteClick(sp.id)}>{t('dashboard.delete')}</button>
+            <p>{sp.description || "No description available"}</p>
+            <p>Location: {sp.location || "N/A"}</p>
+            <p>Active: {sp.is_active ? "Yes" : "No"}</p>
+            <p>{t("staff.queueLength", { length: sp.queue_length || 0 })}</p>
+            <button className="btn-call" onClick={() => callNext(sp.id)}>
+              {t("dashboard.callNext")}
+            </button>
+            <button
+              className="btn-delete"
+              onClick={() => handleDeleteClick(sp.id)}
+            >
+              {t("dashboard.delete")}
+            </button>
           </div>
         ))}
 
@@ -240,11 +308,18 @@ const BankDashboard = ({ user }) => {
         {showDeleteConfirm && (
           <div className="modal-overlay">
             <div className="modal">
-              <h3>{t('queue.deleteConfirm')}</h3>
-              <p>{t('common.confirmMessage')}</p>
+              <h3>{t("queue.deleteConfirm")}</h3>
+              <p>{t("common.confirmMessage")}</p>
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
-                <button className="btn-confirm" onClick={confirmDeleteServicePoint}>{t('common.confirm')}</button>
+                <button className="btn-cancel" onClick={cancelDelete}>
+                  {t("common.cancel")}
+                </button>
+                <button
+                  className="btn-confirm"
+                  onClick={confirmDeleteServicePoint}
+                >
+                  {t("common.confirm")}
+                </button>
               </div>
             </div>
           </div>
@@ -255,24 +330,37 @@ const BankDashboard = ({ user }) => {
           <div className="modal-overlay">
             <div className="modal">
               <h3>Delete All Service Points</h3>
-              <p>Are you sure you want to delete ALL your service points? This action cannot be undone.</p>
+              <p>
+                Are you sure you want to delete ALL your service points? This
+                action cannot be undone.
+              </p>
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
-                <button className="btn-confirm" onClick={confirmDeleteAllServicePoints}>{t('common.confirm')}</button>
+                <button className="btn-cancel" onClick={cancelDelete}>
+                  {t("common.cancel")}
+                </button>
+                <button
+                  className="btn-confirm"
+                  onClick={confirmDeleteAllServicePoints}
+                >
+                  {t("common.confirm")}
+                </button>
               </div>
             </div>
           </div>
         )}
       </div>
       <div className="analytics">
-        <h3>{t('dashboard.analytics')} <span className="realtime">{t('common.realtime')}</span></h3>
+        <h3>
+          {t("dashboard.analytics")}{" "}
+          <span className="realtime">{t("common.realtime")}</span>
+        </h3>
         <div className="metric-card">
           <h3>Average Wait Time</h3>
-          <p>{analytics.average_wait_time || '0 minutes'}</p>
+          <p>{analytics.average_wait_time || "0 minutes"}</p>
         </div>
         <div className="metric-card">
           <h3>Busiest Hour</h3>
-          <p>{analytics.busiest_hour || 'N/A'}</p>
+          <p>{analytics.busiest_hour || "N/A"}</p>
         </div>
         <div className="metric-card">
           <h3>Abandoned Queues</h3>
