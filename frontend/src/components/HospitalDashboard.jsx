@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 const HospitalDashboard = ({ user }) => {
   const { t } = useTranslation();
   const [servicePoints, setServicePoints] = useState([]);
   const [analytics, setAnalytics] = useState({});
   const [newServicePoint, setNewServicePoint] = useState({
-    name: '',
-    description: '',
-    location: '',
+    name: "",
+    description: "",
+    location: "",
     is_active: true,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -23,13 +23,17 @@ const HospitalDashboard = ({ user }) => {
   }, []);
 
   useEffect(() => {
-    servicePoints.forEach(sp => {
+    servicePoints.forEach((sp) => {
       if (!wsRefs.current[sp.id]) {
         const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.queue_length !== undefined) {
-            setServicePoints(prev => prev.map(s => s.id === sp.id ? { ...s, queue_length: data.queue_length } : s));
+            setServicePoints((prev) =>
+              prev.map((s) =>
+                s.id === sp.id ? { ...s, queue_length: data.queue_length } : s
+              )
+            );
           }
         };
         wsRefs.current[sp.id] = ws;
@@ -37,14 +41,16 @@ const HospitalDashboard = ({ user }) => {
     });
 
     return () => {
-      Object.values(wsRefs.current).forEach(ws => ws.close());
+      Object.values(wsRefs.current).forEach((ws) => ws.close());
       wsRefs.current = {};
     };
   }, [servicePoints]);
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/service-points/');
+      const response = await axios.get(
+        "http://localhost:8000/api/queues/service-points/"
+      );
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -53,7 +59,9 @@ const HospitalDashboard = ({ user }) => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/analytics/');
+      const response = await axios.get(
+        "http://localhost:8000/api/queues/analytics/"
+      );
       setAnalytics(response.data);
     } catch (err) {
       console.error(err);
@@ -62,11 +70,14 @@ const HospitalDashboard = ({ user }) => {
 
   const createServicePoint = async () => {
     try {
-      await axios.post('http://localhost:8000/api/queues/create-service-point/', newServicePoint);
+      await axios.post(
+        "http://localhost:8000/api/queues/create-service-point/",
+        newServicePoint
+      );
       setNewServicePoint({
-        name: '',
-        description: '',
-        location: '',
+        name: "",
+        description: "",
+        location: "",
         is_active: true,
       });
       fetchServicePoints();
@@ -77,7 +88,9 @@ const HospitalDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post('http://localhost:8000/api/queues/call-next/', { service_point_id: servicePointId });
+      await axios.post("http://localhost:8000/api/queues/call-next/", {
+        service_point_id: servicePointId,
+      });
       fetchServicePoints();
     } catch (err) {
       console.error(err);
@@ -96,12 +109,14 @@ const HospitalDashboard = ({ user }) => {
   const confirmDeleteServicePoint = async () => {
     if (deleteServicePointId) {
       try {
-        await axios.delete(`http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`);
+        await axios.delete(
+          `http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`
+        );
         fetchServicePoints();
-        console.log(t('queue.deleteSuccess'));
+        console.log(t("queue.deleteSuccess"));
       } catch (err) {
         console.error(err);
-        console.error(t('messages.deleteServicePointError'));
+        console.error(t("messages.deleteServicePointError"));
       }
     }
     setShowDeleteConfirm(false);
@@ -110,12 +125,14 @@ const HospitalDashboard = ({ user }) => {
 
   const confirmDeleteAllServicePoints = async () => {
     try {
-      await axios.delete('http://localhost:8000/api/queues/delete-all-service-points/');
+      await axios.delete(
+        "http://localhost:8000/api/queues/delete-all-service-points/"
+      );
       fetchServicePoints();
-      console.log(t('messages.deleteAllSuccess'));
+      console.log(t("messages.deleteAllSuccess"));
     } catch (err) {
       console.error(err);
-      console.error(t('messages.deleteAllError'));
+      console.error(t("messages.deleteAllError"));
     }
     setShowDeleteAllConfirm(false);
   };
@@ -128,71 +145,107 @@ const HospitalDashboard = ({ user }) => {
 
   return (
     <div className="dashboard hospital-dashboard">
-      <h2>{t('app.welcome', { username: user.username })} - Hospital Staff</h2>
+      <h2>{t("app.welcome", { username: user.username })} - Hospital Staff</h2>
       <div className="hospital-features">
         <div className="feature-card">
           <h3>🏥 Medical Services</h3>
-          <p>Manage patient queues for consultations, emergency care, and medical appointments</p>
+          <p>
+            Manage patient queues for consultations, emergency care, and medical
+            appointments
+          </p>
         </div>
         <div className="feature-card">
           <h3>💊 Pharmacy & Lab</h3>
-          <p>Handle medication dispensing and laboratory test result collections efficiently</p>
+          <p>
+            Handle medication dispensing and laboratory test result collections
+            efficiently
+          </p>
         </div>
         <div className="feature-card">
           <h3>📊 Patient Analytics</h3>
-          <p>Track patient wait times and healthcare service delivery metrics</p>
+          <p>
+            Track patient wait times and healthcare service delivery metrics
+          </p>
         </div>
       </div>
       <div className="form-group">
-        <h3>{t('staff.createServicePoint')}</h3>
-        <label htmlFor="name">{t('common.name')}</label>
+        <h3>{t("staff.createServicePoint")}</h3>
+        <label htmlFor="name">{t("common.name")}</label>
         <input
           id="name"
           type="text"
-          placeholder={t('common.name')}
+          placeholder={t("common.name")}
           value={newServicePoint.name}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, name: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, name: e.target.value })
+          }
         />
-        <label htmlFor="description">{t('common.description')}</label>
+        <label htmlFor="description">{t("common.description")}</label>
         <textarea
           id="description"
-          placeholder={t('common.description')}
+          placeholder={t("common.description")}
           value={newServicePoint.description}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, description: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({
+              ...newServicePoint,
+              description: e.target.value,
+            })
+          }
         />
-        <label htmlFor="location">{t('common.location')}</label>
+        <label htmlFor="location">{t("common.location")}</label>
         <input
           id="location"
           type="text"
-          placeholder={t('common.location')}
+          placeholder={t("common.location")}
           value={newServicePoint.location}
-          onChange={(e) => setNewServicePoint({ ...newServicePoint, location: e.target.value })}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, location: e.target.value })
+          }
         />
         <label htmlFor="is_active">
           <input
             id="is_active"
             type="checkbox"
             checked={newServicePoint.is_active}
-            onChange={(e) => setNewServicePoint({ ...newServicePoint, is_active: e.target.checked })}
+            onChange={(e) =>
+              setNewServicePoint({
+                ...newServicePoint,
+                is_active: e.target.checked,
+              })
+            }
           />
-          {t('common.active')}
+          {t("common.active")}
         </label>
-        <button className="btn-primary" onClick={createServicePoint}>{t('staff.createServicePoint')}</button>
+        <button className="btn-primary" onClick={createServicePoint}>
+          {t("staff.createServicePoint")}
+        </button>
       </div>
       <div className="service-points">
-        <h3>{t('dashboard.servicePoints')} <span className="realtime">{t('common.realtime')}</span></h3>
+        <h3>
+          {t("dashboard.servicePoints")}{" "}
+          <span className="realtime">{t("common.realtime")}</span>
+        </h3>
         {servicePoints.length > 0 && (
-          <button className="btn-delete-all" onClick={handleDeleteAllClick}>Delete All Service Points</button>
+          <button className="btn-delete-all" onClick={handleDeleteAllClick}>
+            Delete All Service Points
+          </button>
         )}
         {servicePoints.map((sp) => (
           <div key={sp.id} className="service-card">
             <h3>{sp.name}</h3>
-            <p>{sp.description || 'No description available'}</p>
-            <p>Location: {sp.location || 'N/A'}</p>
-            <p>Active: {sp.is_active ? 'Yes' : 'No'}</p>
-            <p>{t('staff.queueLength', { length: sp.queue_length || 0 })}</p>
-            <button className="btn-call" onClick={() => callNext(sp.id)}>{t('dashboard.callNext')}</button>
-            <button className="btn-delete" onClick={() => handleDeleteClick(sp.id)}>{t('dashboard.delete')}</button>
+            <p>{sp.description || "No description available"}</p>
+            <p>Location: {sp.location || "N/A"}</p>
+            <p>Active: {sp.is_active ? "Yes" : "No"}</p>
+            <p>{t("staff.queueLength", { length: sp.queue_length || 0 })}</p>
+            <button className="btn-call" onClick={() => callNext(sp.id)}>
+              {t("dashboard.callNext")}
+            </button>
+            <button
+              className="btn-delete"
+              onClick={() => handleDeleteClick(sp.id)}
+            >
+              {t("dashboard.delete")}
+            </button>
           </div>
         ))}
 
@@ -200,11 +253,18 @@ const HospitalDashboard = ({ user }) => {
         {showDeleteConfirm && (
           <div className="modal-overlay">
             <div className="modal">
-              <h3>{t('queue.deleteConfirm')}</h3>
-              <p>{t('common.confirmMessage')}</p>
+              <h3>{t("queue.deleteConfirm")}</h3>
+              <p>{t("common.confirmMessage")}</p>
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
-                <button className="btn-confirm" onClick={confirmDeleteServicePoint}>{t('common.confirm')}</button>
+                <button className="btn-cancel" onClick={cancelDelete}>
+                  {t("common.cancel")}
+                </button>
+                <button
+                  className="btn-confirm"
+                  onClick={confirmDeleteServicePoint}
+                >
+                  {t("common.confirm")}
+                </button>
               </div>
             </div>
           </div>
@@ -215,24 +275,37 @@ const HospitalDashboard = ({ user }) => {
           <div className="modal-overlay">
             <div className="modal">
               <h3>Delete All Service Points</h3>
-              <p>Are you sure you want to delete ALL your service points? This action cannot be undone.</p>
+              <p>
+                Are you sure you want to delete ALL your service points? This
+                action cannot be undone.
+              </p>
               <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>{t('common.cancel')}</button>
-                <button className="btn-confirm" onClick={confirmDeleteAllServicePoints}>{t('common.confirm')}</button>
+                <button className="btn-cancel" onClick={cancelDelete}>
+                  {t("common.cancel")}
+                </button>
+                <button
+                  className="btn-confirm"
+                  onClick={confirmDeleteAllServicePoints}
+                >
+                  {t("common.confirm")}
+                </button>
               </div>
             </div>
           </div>
         )}
       </div>
       <div className="analytics">
-        <h3>{t('dashboard.analytics')} <span className="realtime">{t('common.realtime')}</span></h3>
+        <h3>
+          {t("dashboard.analytics")}{" "}
+          <span className="realtime">{t("common.realtime")}</span>
+        </h3>
         <div className="metric-card">
           <h3>Average Wait Time</h3>
-          <p>{analytics.average_wait_time || '0 minutes'}</p>
+          <p>{analytics.average_wait_time || "0 minutes"}</p>
         </div>
         <div className="metric-card">
           <h3>Busiest Hour</h3>
-          <p>{analytics.busiest_hour || 'N/A'}</p>
+          <p>{analytics.busiest_hour || "N/A"}</p>
         </div>
         <div className="metric-card">
           <h3>Abandoned Queues</h3>
