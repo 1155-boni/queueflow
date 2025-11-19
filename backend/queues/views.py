@@ -1,13 +1,24 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils import timezone
-from django.db.models import F, Avg, Count, Max
+from django.db.models import F, Avg, Count, Max, ExpressionWrapper, DurationField
+from django.db.models.functions import ExtractHour
 from datetime import timedelta
 from .models import QueueEntry, Notification, ServicePoint
 from .serializers import ServicePointSerializer, QueueEntrySerializer, JoinQueueSerializer, NotificationSerializer
 from .tasks import send_queue_notification_email, send_queue_update
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def public_service_points(request):
+    """
+    List all active service points for public view (landing page).
+    """
+    service_points = ServicePoint.objects.filter(is_active=True)
+    serializer = ServicePointSerializer(service_points, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -257,33 +268,36 @@ def analytics(request):
     # Get analytics for staff's service points
     service_points = ServicePoint.objects.filter(creator=request.user)
 
-    total_served = QueueEntry.objects.filter(
-        service_point__in=service_points,
-        status='served'
-    ).count()
+    # Total queues (all entries)
+    total_queues = QueueEntry.objects.filter(service_point__in=service_points).count()
 
-    # Average wait time (from join to served)
-    avg_wait_time = QueueEntry.objects.filter(
+    # Average wait time in minutes
+    avg_wait_time_delta = QueueEntry.objects.filter(
         service_point__in=service_points,
         status='served',
         served_at__isnull=False
     ).aggregate(
         avg_wait=Avg(F('served_at') - F('joined_at'))
     )['avg_wait']
+    average_wait_time = round(avg_wait_time_delta.total_seconds() / 60, 2) if avg_wait_time_delta else 0
 
-    # Current queue lengths
-    current_queues = []
-    for sp in service_points:
-        length = sp.queue_entries.filter(status__in=['waiting', 'called']).count()
-        current_queues.append({
-            'service_point': sp.name,
-            'queue_length': length
-        })
+    # Busiest hour
+    busiest_hour_data = QueueEntry.objects.filter(
+        service_point__in=service_points
+    ).annotate(hour=ExtractHour('joined_at')).values('hour').annotate(count=Count('id')).order_by('-count').first()
+    busiest_hour = busiest_hour_data['hour'] if busiest_hour_data else None
+
+    # Abandoned queues
+    abandoned_queues = QueueEntry.objects.filter(
+        service_point__in=service_points,
+        status='abandoned'
+    ).count()
 
     return Response({
-        'total_served': total_served,
-        'average_wait_time_seconds': avg_wait_time.total_seconds() if avg_wait_time else None,
-        'current_queues': current_queues
+        'total_queues': total_queues,
+        'average_wait_time': f"{average_wait_time} minutes",
+        'busiest_hour': busiest_hour,
+        'abandoned_queues': abandoned_queues
     })
 
 

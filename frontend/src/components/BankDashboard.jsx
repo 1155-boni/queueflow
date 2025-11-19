@@ -9,7 +9,12 @@ const BankDashboard = ({ user }) => {
   const [newServicePoint, setNewServicePoint] = useState({
     name: '',
     description: '',
+    bank_name: '',
+    branch: '',
     location: '',
+    directions: '',
+    latitude: null,
+    longitude: null,
     is_active: true,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -66,7 +71,11 @@ const BankDashboard = ({ user }) => {
       setNewServicePoint({
         name: '',
         description: '',
+        bank_name: '',
+        branch: '',
         location: '',
+        directions: '',
+        teller_no: '',
         is_active: true,
       });
       fetchServicePoints();
@@ -160,6 +169,22 @@ const BankDashboard = ({ user }) => {
           value={newServicePoint.description}
           onChange={(e) => setNewServicePoint({ ...newServicePoint, description: e.target.value })}
         />
+        <label htmlFor="bank_name">Bank Name</label>
+        <input
+          id="bank_name"
+          type="text"
+          placeholder="Bank Name"
+          value={newServicePoint.bank_name}
+          onChange={(e) => setNewServicePoint({ ...newServicePoint, bank_name: e.target.value })}
+        />
+        <label htmlFor="branch">Branch</label>
+        <input
+          id="branch"
+          type="text"
+          placeholder="Branch"
+          value={newServicePoint.branch}
+          onChange={(e) => setNewServicePoint({ ...newServicePoint, branch: e.target.value })}
+        />
         <label htmlFor="location">{t('common.location')}</label>
         <input
           id="location"
@@ -167,6 +192,21 @@ const BankDashboard = ({ user }) => {
           placeholder={t('common.location')}
           value={newServicePoint.location}
           onChange={(e) => setNewServicePoint({ ...newServicePoint, location: e.target.value })}
+        />
+        <label htmlFor="directions">Directions</label>
+        <textarea
+          id="directions"
+          placeholder="Enter directions to the location"
+          value={newServicePoint.directions}
+          onChange={(e) => setNewServicePoint({ ...newServicePoint, directions: e.target.value })}
+        />
+        <label htmlFor="teller_no">Teller No</label>
+        <input
+          id="teller_no"
+          type="text"
+          placeholder="Teller Number"
+          value={newServicePoint.teller_no || ''}
+          onChange={(e) => setNewServicePoint({ ...newServicePoint, teller_no: e.target.value })}
         />
         <label htmlFor="is_active">
           <input

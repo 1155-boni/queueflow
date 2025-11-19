@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import join_queue, my_queue_position, service_points, create_service_point, delete_service_point, delete_all_service_points, call_next, analytics, leave_queue, notifications, mark_notification_read, dismiss_customer
+from .views import join_queue, my_queue_position, service_points, create_service_point, delete_service_point, delete_all_service_points, call_next, analytics, leave_queue, notifications, mark_notification_read, dismiss_customer, public_service_points
 
 urlpatterns = [
+    path('public-service-points/', public_service_points, name='public_service_points'),
     path('service-points/', service_points, name='service_points'),
     path('create-service-point/', create_service_point, name='create_service_point'),
     path('delete-service-point/<int:service_point_id>/', delete_service_point, name='delete_service_point'),

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "QueueFlow",
+    "title": "LineHub",
     "welcome": "Bienvenido, {{username}}",
     "settings": "Configuración"
   },

@@ -212,17 +212,19 @@ const StaffDashboard = ({ user }) => {
       </div>
       <div className="analytics">
         <h3>{t('dashboard.analytics')} <span className="realtime">{t('common.realtime')}</span></h3>
-        <div className="metric-card">
-          <h3>Average Wait Time</h3>
-          <p>{analytics.average_wait_time || '0 minutes'}</p>
-        </div>
-        <div className="metric-card">
-          <h3>Busiest Hour</h3>
-          <p>{analytics.busiest_hour || 'N/A'}</p>
-        </div>
-        <div className="metric-card">
-          <h3>Abandoned Queues</h3>
-          <p>{analytics.abandoned_queues || 0}</p>
+        <div className="stats-grid">
+          <div className="metric-card">
+            <h3>Average Wait Time</h3>
+            <p>{analytics.average_wait_time || '0 minutes'}</p>
+          </div>
+          <div className="metric-card">
+            <h3>Busiest Hour</h3>
+            <p>{analytics.busiest_hour || 'N/A'}</p>
+          </div>
+          <div className="metric-card">
+            <h3>Abandoned Queues</h3>
+            <p>{analytics.abandoned_queues || 0}</p>
+          </div>
         </div>
       </div>
     </div>

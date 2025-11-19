@@ -17,6 +17,20 @@ axios.defaults.withCredentials = true;
 function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState('landing');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Apply dark mode on mount and when darkMode changes
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode]);
 
   // Check authentication status on app load
   useEffect(() => {
@@ -70,12 +84,12 @@ function App() {
       console.error('Logout error:', err);
     }
     setUser(null);
-    setView('login');
+    setView('landing');
   };
 
   const handleDeleteAccount = () => {
     setUser(null);
-    setView('login');
+    setView('landing');
   };
 
   const handleSettings = () => {
@@ -84,6 +98,10 @@ function App() {
 
   const handleBackToDashboard = () => {
     setView('dashboard');
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   };
 
   return (

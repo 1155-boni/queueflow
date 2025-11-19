@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "QueueFlow",
+    "title": "LineHub",
     "welcome": "Karibu, {{username}}",
     "settings": "Mipangilio"
   },

@@ -1,4 +1,4 @@
-# QueueFlow - The Pride of Africa
+# LineHub - The Hub of Effortless Service
 
 A modern queue management system built with Django REST Framework and React, designed for efficient service point management in African banking institutions.
 
@@ -215,4 +215,4 @@ For support and questions, please open an issue on GitHub or contact the develop
 
 ---
 
-**QueueFlow** - Empowering efficient service delivery across Africa 🇰🇪🇹🇿🇺🇬🇷🇼🇧🇮
+**LineHub** - Empowering efficient service delivery across Africa 🇰🇪🇹🇿🇺🇬🇷🇼🇧🇮

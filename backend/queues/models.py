@@ -18,10 +18,14 @@ class Notification(models.Model):
 class ServicePoint(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    bank_name = models.CharField(max_length=100, blank=True)
+    branch = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=200, blank=True)
+    directions = models.TextField(blank=True)
+    teller_no = models.CharField(max_length=10, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_service_points')
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_service_points', default=1)
 
     def __str__(self):
         return self.name
