@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
   const [servicePoints, setServicePoints] = useState([]);
@@ -11,11 +11,13 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/queues/public-service-points/');
+      const response = await axios.get(
+        "http://localhost:8000/api/queues/public-service-points/"
+      );
       setServicePoints(response.data);
     } catch (err) {
-      console.error('Error fetching service points:', err);
-      setError('Unable to load service points at this time.');
+      console.error("Error fetching service points:", err);
+      setError("Unable to load service points at this time.");
     }
   };
   return (
@@ -23,10 +25,17 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
       {/* Hero Section */}
       <section className="hero">
         <h1>Welcome to LineHub</h1>
-        <p>The Hub of Effortless Service - Streamline your queues and enhance customer experience</p>
+        <p>
+          The Hub of Effortless Service - Streamline your queues and enhance
+          customer experience
+        </p>
         <div className="hero-buttons">
-          <button className="btn-primary" onClick={onSwitchToRegister}>Get Started</button>
-          <button className="btn-secondary" onClick={onSwitchToLogin}>Sign In</button>
+          <button className="btn-primary" onClick={onSwitchToRegister}>
+            Get Started
+          </button>
+          <button className="btn-secondary" onClick={onSwitchToLogin}>
+            Sign In
+          </button>
         </div>
       </section>
 
@@ -60,22 +69,32 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           <div className="step">
             <div className="step-number">1</div>
             <h4>Sign Up & Set Up</h4>
-            <p>Create your account and configure your service points in minutes.</p>
+            <p>
+              Create your account and configure your service points in minutes.
+            </p>
           </div>
           <div className="step">
             <div className="step-number">2</div>
             <h4>Manage Queues</h4>
-            <p>Use our intuitive dashboard to monitor and control your queues in real-time.</p>
+            <p>
+              Use our intuitive dashboard to monitor and control your queues in
+              real-time.
+            </p>
           </div>
           <div className="step">
             <div className="step-number">3</div>
             <h4>Engage Customers</h4>
-            <p>Send notifications and gather feedback to improve service quality.</p>
+            <p>
+              Send notifications and gather feedback to improve service quality.
+            </p>
           </div>
           <div className="step">
             <div className="step-number">4</div>
             <h4>Analyze & Optimize</h4>
-            <p>Review analytics to optimize operations and enhance customer satisfaction.</p>
+            <p>
+              Review analytics to optimize operations and enhance customer
+              satisfaction.
+            </p>
           </div>
         </div>
       </section>
@@ -89,15 +108,24 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           <h3>🏦 Banking Solutions</h3>
           <div className="feature-card">
             <h4>Real-time Queue Management</h4>
-            <p>Monitor and manage customer queues in real-time with our advanced dashboard.</p>
+            <p>
+              Monitor and manage customer queues in real-time with our advanced
+              dashboard.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Automated Notifications</h4>
-            <p>Keep customers informed with SMS and email notifications about their queue status.</p>
+            <p>
+              Keep customers informed with SMS and email notifications about
+              their queue status.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Analytics & Reporting</h4>
-            <p>Gain insights into queue performance with detailed analytics and reports.</p>
+            <p>
+              Gain insights into queue performance with detailed analytics and
+              reports.
+            </p>
           </div>
         </div>
 
@@ -106,15 +134,23 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           <h3>🏛️ Government Services</h3>
           <div className="feature-card">
             <h4>Efficient Public Service</h4>
-            <p>Streamline government offices with organized queue systems for better citizen service.</p>
+            <p>
+              Streamline government offices with organized queue systems for
+              better citizen service.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Appointment Scheduling</h4>
-            <p>Allow citizens to book appointments online, reducing wait times and improving satisfaction.</p>
+            <p>
+              Allow citizens to book appointments online, reducing wait times
+              and improving satisfaction.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Compliance & Security</h4>
-            <p>Ensure data security and compliance with government standards.</p>
+            <p>
+              Ensure data security and compliance with government standards.
+            </p>
           </div>
         </div>
 
@@ -123,15 +159,24 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           <h3>🏥 Healthcare Solutions</h3>
           <div className="feature-card">
             <h4>Patient Queue Management</h4>
-            <p>Manage patient queues efficiently to reduce waiting times in hospitals and clinics.</p>
+            <p>
+              Manage patient queues efficiently to reduce waiting times in
+              hospitals and clinics.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Emergency Prioritization</h4>
-            <p>Prioritize emergency cases while maintaining fair queue management for all patients.</p>
+            <p>
+              Prioritize emergency cases while maintaining fair queue management
+              for all patients.
+            </p>
           </div>
           <div className="feature-card">
             <h4>Staff Coordination</h4>
-            <p>Coordinate staff assignments and resources based on real-time queue data.</p>
+            <p>
+              Coordinate staff assignments and resources based on real-time
+              queue data.
+            </p>
           </div>
         </div>
       </section>
@@ -141,15 +186,24 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
         <h2>What Our Customers Say</h2>
         <div className="testimonials-grid">
           <div className="testimonial">
-            <p>"LineHub transformed our bank operations. Wait times dropped by 40% and customer satisfaction soared!"</p>
+            <p>
+              "LineHub transformed our bank operations. Wait times dropped by
+              40% and customer satisfaction soared!"
+            </p>
             <cite>- Sarah Johnson, Bank Manager</cite>
           </div>
           <div className="testimonial">
-            <p>"The government services module made our office more efficient. Citizens love the appointment system."</p>
+            <p>
+              "The government services module made our office more efficient.
+              Citizens love the appointment system."
+            </p>
             <cite>- Michael Chen, Government Official</cite>
           </div>
           <div className="testimonial">
-            <p>"In healthcare, every minute counts. LineHub helps us prioritize emergencies while managing regular patients."</p>
+            <p>
+              "In healthcare, every minute counts. LineHub helps us prioritize
+              emergencies while managing regular patients."
+            </p>
             <cite>- Dr. Emily Rodriguez, Hospital Director</cite>
           </div>
         </div>
@@ -166,10 +220,16 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
             {servicePoints.map((sp) => (
               <div key={sp.id} className="service-point-card">
                 <h3>{sp.name}</h3>
-                <p>{sp.description || 'No description available'}</p>
-                <p><strong>Location:</strong> {sp.location || 'N/A'}</p>
-                <p><strong>Current Queue:</strong> {sp.queue_length || 0} people</p>
-                <button className="btn-secondary" onClick={onSwitchToLogin}>Join Queue</button>
+                <p>{sp.description || "No description available"}</p>
+                <p>
+                  <strong>Location:</strong> {sp.location || "N/A"}
+                </p>
+                <p>
+                  <strong>Current Queue:</strong> {sp.queue_length || 0} people
+                </p>
+                <button className="btn-secondary" onClick={onSwitchToLogin}>
+                  Join Queue
+                </button>
               </div>
             ))}
           </div>
@@ -179,8 +239,13 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
       {/* Call to Action */}
       <section className="cta">
         <h2>Ready to Transform Your Service Experience?</h2>
-        <p>Join thousands of organizations already using LineHub to improve their operations.</p>
-        <button className="btn-primary" onClick={onSwitchToRegister}>Start Your Free Trial</button>
+        <p>
+          Join thousands of organizations already using LineHub to improve their
+          operations.
+        </p>
+        <button className="btn-primary" onClick={onSwitchToRegister}>
+          Start Your Free Trial
+        </button>
       </section>
     </div>
   );
