@@ -1,0 +1,27 @@
+.logo-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.logo-image {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.logo-card h1 {
+  color: #333;
+  margin: 0;
+  font-size: 28px;
+}
+
+.logo-card p {
+  color: #666;
+  margin: 10px 0 0 0;
+  font-size: 14px;
+}
