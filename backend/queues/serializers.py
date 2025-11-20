@@ -8,8 +8,8 @@ class ServicePointSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ServicePoint
-        fields = ('id', 'name', 'description', 'bank_name', 'branch', 'location', 'directions', 'teller_no', 'is_active', 'created_at', 'creator', 'queue_length')
-        read_only_fields = ('created_at', 'creator', 'queue_length')
+        fields = ('id', 'name', 'description', 'bank_name', 'branch', 'location', 'directions', 'teller_no', 'is_active', 'created_at', 'queue_length')
+        read_only_fields = ('created_at', 'queue_length')
 
 
 
