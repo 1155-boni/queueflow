@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const UserDashboard = ({ user }) => {
   const { t } = useTranslation();
@@ -24,7 +25,7 @@ const UserDashboard = ({ user }) => {
   useEffect(() => {
     servicePoints.forEach((sp) => {
       if (!wsRefs.current[sp.id]) {
-        const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
+        const ws = new WebSocket(`${API_BASE_URL.replace('http', 'ws')}/ws/queues/${sp.id}/`);
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.deleted) {
@@ -55,7 +56,7 @@ const UserDashboard = ({ user }) => {
   const fetchServicePoints = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/queues/service-points/"
+        `${API_BASE_URL}/api/queues/service-points/`
       );
       setServicePoints(response.data);
     } catch (err) {
@@ -66,7 +67,7 @@ const UserDashboard = ({ user }) => {
   const fetchMyQueue = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/queues/my-position/"
+        `${API_BASE_URL}/api/queues/my-position/`
       );
       setMyQueue(response.data);
     } catch (err) {
@@ -77,7 +78,7 @@ const UserDashboard = ({ user }) => {
   const fetchNotifications = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/queues/notifications/"
+        `${API_BASE_URL}/api/queues/notifications/`
       );
       setNotifications(response.data);
     } catch (err) {
@@ -88,7 +89,7 @@ const UserDashboard = ({ user }) => {
   const markNotificationRead = async (notificationId) => {
     try {
       await axios.post(
-        `http://localhost:8000/api/queues/notifications/${notificationId}/mark-read/`
+        `${API_BASE_URL}/api/queues/notifications/${notificationId}/mark-read/`
       );
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
@@ -104,7 +105,7 @@ const UserDashboard = ({ user }) => {
 
   const joinQueue = async (servicePointId) => {
     try {
-      await axios.post("http://localhost:8000/api/queues/join/", {
+      await axios.post(`${API_BASE_URL}/api/queues/join/`, {
         service_point_id: servicePointId,
       });
       fetchMyQueue();
@@ -120,7 +121,7 @@ const UserDashboard = ({ user }) => {
   const leaveQueue = async () => {
     if (myQueue) {
       try {
-        await axios.post("http://localhost:8000/api/queues/leave/", {
+        await axios.post(`${API_BASE_URL}/api/queues/leave/`, {
           service_point_id: myQueue.service_point.id,
         });
         setMyQueue(null);

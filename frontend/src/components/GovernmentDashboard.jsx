@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const GovernmentDashboard = ({ user }) => {
   const { t } = useTranslation();
@@ -110,7 +111,7 @@ const GovernmentDashboard = ({ user }) => {
     if (deleteServicePointId) {
       try {
         await axios.delete(
-          `http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`
+          `${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`
         );
         fetchServicePoints();
         console.log(t("queue.deleteSuccess"));
@@ -126,7 +127,7 @@ const GovernmentDashboard = ({ user }) => {
   const confirmDeleteAllServicePoints = async () => {
     try {
       await axios.delete(
-        "http://localhost:8000/api/queues/delete-all-service-points/"
+        `${API_BASE_URL}/api/queues/delete-all-service-points/`
       );
       fetchServicePoints();
       console.log(t("messages.deleteAllSuccess"));

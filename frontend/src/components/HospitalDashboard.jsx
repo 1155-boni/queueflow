@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
+import API_BASE_URL from "../config";
 
 const HospitalDashboard = ({ user }) => {
   const { t } = useTranslation();
@@ -25,7 +27,7 @@ const HospitalDashboard = ({ user }) => {
   useEffect(() => {
     servicePoints.forEach((sp) => {
       if (!wsRefs.current[sp.id]) {
-        const ws = new WebSocket(`ws://localhost:8000/ws/queues/${sp.id}/`);
+        const ws = new WebSocket(`${API_BASE_URL.replace('http', 'ws')}/ws/queues/${sp.id}/`);
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           if (data.queue_length !== undefined) {
@@ -49,7 +51,7 @@ const HospitalDashboard = ({ user }) => {
   const fetchServicePoints = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/queues/service-points/"
+        `${API_BASE_URL}/api/queues/service-points/`
       );
       setServicePoints(response.data);
     } catch (err) {
@@ -60,7 +62,7 @@ const HospitalDashboard = ({ user }) => {
   const fetchAnalytics = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/queues/analytics/"
+        `${API_BASE_URL}/api/queues/analytics/`
       );
       setAnalytics(response.data);
     } catch (err) {
@@ -71,7 +73,7 @@ const HospitalDashboard = ({ user }) => {
   const createServicePoint = async () => {
     try {
       await axios.post(
-        "http://localhost:8000/api/queues/create-service-point/",
+        `${API_BASE_URL}/api/queues/create-service-point/`,
         newServicePoint
       );
       setNewServicePoint({
@@ -88,7 +90,7 @@ const HospitalDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post("http://localhost:8000/api/queues/call-next/", {
+      await axios.post(`${API_BASE_URL}/api/queues/call-next/`, {
         service_point_id: servicePointId,
       });
       fetchServicePoints();
@@ -110,7 +112,7 @@ const HospitalDashboard = ({ user }) => {
     if (deleteServicePointId) {
       try {
         await axios.delete(
-          `http://localhost:8000/api/queues/delete-service-point/${deleteServicePointId}/`
+          `${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`
         );
         fetchServicePoints();
         console.log(t("queue.deleteSuccess"));
@@ -126,7 +128,7 @@ const HospitalDashboard = ({ user }) => {
   const confirmDeleteAllServicePoints = async () => {
     try {
       await axios.delete(
-        "http://localhost:8000/api/queues/delete-all-service-points/"
+        `${API_BASE_URL}/api/queues/delete-all-service-points/`
       );
       fetchServicePoints();
       console.log(t("messages.deleteAllSuccess"));

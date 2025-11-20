@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 
 const Login = ({ onLogin, onSwitchToRegister }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
