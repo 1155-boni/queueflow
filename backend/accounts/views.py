@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from datetime import timedelta
 from rest_framework_simplejwt.exceptions import TokenError
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -79,6 +81,7 @@ class CustomLoginView(TokenObtainPairView):
         return response
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def refresh_token(request):
@@ -127,6 +130,7 @@ def profile(request):
     })
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def logout(request):
@@ -139,6 +143,7 @@ def logout(request):
     return response
 
 
+@csrf_exempt
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user(request):
