@@ -1,3 +1,4 @@
+import logging
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,6 +13,8 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from datetime import timedelta
 from rest_framework_simplejwt.exceptions import TokenError
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt

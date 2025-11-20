@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import axios from "axios";
+import API_BASE_URL from "./config";
 import LandingPage from "./components/LandingPage.jsx";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
@@ -36,19 +37,9 @@ function App() {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        // Check if we have access token in cookies
-        const accessToken = document.cookie
-          .split(";")
-          .find((c) => c.trim().startsWith("access_token="));
-        if (!accessToken) {
-          setUser(null);
-          // Keep landing page as default view for unauthenticated users
-          return;
-        }
-
-        // Try to get user profile or make authenticated request
+        // Try to get user profile - if access token is valid, it will succeed
         const response = await axios.get(
-          "http://localhost:8000/api/auth/profile/",
+          `${API_BASE_URL}/api/auth/profile/`,
           { withCredentials: true }
         );
         setUser(response.data);
@@ -57,13 +48,13 @@ function App() {
         // If token is invalid or expired, try to refresh
         try {
           await axios.post(
-            "http://localhost:8000/api/auth/refresh/",
+            `${API_BASE_URL}/api/auth/refresh/`,
             {},
             { withCredentials: true }
           );
           // If refresh successful, retry the profile request
           const response = await axios.get(
-            "http://localhost:8000/api/auth/profile/",
+            `${API_BASE_URL}/api/auth/profile/`,
             { withCredentials: true }
           );
           setUser(response.data);
