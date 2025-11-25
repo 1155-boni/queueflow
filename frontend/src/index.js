@@ -7,6 +7,7 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import axios from "axios";
 
+
 // Configure axios to send credentials with requests
 axios.defaults.withCredentials = true;
 
@@ -21,12 +22,12 @@ axios.interceptors.response.use(
         await axios.post("http://localhost:8000/api/auth/refresh/");
         return axios(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, clear local storage and redirect to login
+        // If refresh fails, clear local storage
         console.error("Token refresh failed:", refreshError);
-        // Clear any local state and redirect to login
+        // Clear any local state
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = "/"; // Redirect to root which should show login
+        // Do not redirect; let the app handle unauthenticated state
       }
     }
     return Promise.reject(error);

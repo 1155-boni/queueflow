@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
+
+
 
 const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   const { t, i18n } = useTranslation();
@@ -32,7 +35,7 @@ const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
 
   const confirmDeleteAccount = async () => {
     try {
-      await axios.delete("http://localhost:8000/api/auth/delete-user/");
+      await axios.delete(`${API_BASE_URL}/api/auth/delete-user/`);
       onDeleteAccount();
     } catch (err) {
       console.error(err);

@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(required=False, allow_blank=True, allow_null=True)
+    email = serializers.EmailField(required=True)
     organization_type = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:

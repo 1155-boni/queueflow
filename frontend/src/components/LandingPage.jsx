@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
   const [servicePoints, setServicePoints] = useState([]);
@@ -11,9 +12,7 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/queues/public-service-points/"
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/public-service-points/`);
       setServicePoints(response.data);
     } catch (err) {
       console.error("Error fetching service points:", err);

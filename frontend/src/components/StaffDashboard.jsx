@@ -11,6 +11,7 @@ const StaffDashboard = ({ user }) => {
     name: "",
     description: "",
     location: "",
+    map_url: "",
     is_active: true,
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -49,9 +50,7 @@ const StaffDashboard = ({ user }) => {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/service-points/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/service-points/`);
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -60,9 +59,7 @@ const StaffDashboard = ({ user }) => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/analytics/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/analytics/`);
       setAnalytics(response.data);
     } catch (err) {
       console.error(err);
@@ -71,10 +68,7 @@ const StaffDashboard = ({ user }) => {
 
   const createServicePoint = async () => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/api/queues/create-service-point/`,
-        newServicePoint
-      );
+      await axios.post(`${API_BASE_URL}/api/queues/create-service-point/`, newServicePoint);
       setNewServicePoint({
         name: "",
         description: "",
@@ -89,9 +83,7 @@ const StaffDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post(`${API_BASE_URL}/api/queues/call-next/`, {
-        service_point_id: servicePointId,
-      });
+      await axios.post(`${API_BASE_URL}/api/queues/call-next/`, { service_point_id: servicePointId });
       fetchServicePoints();
     } catch (err) {
       console.error(err);
@@ -110,9 +102,7 @@ const StaffDashboard = ({ user }) => {
   const confirmDeleteServicePoint = async () => {
     if (deleteServicePointId) {
       try {
-        await axios.delete(
-          `${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`
-        );
+        await axios.delete(`${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`);
         fetchServicePoints();
         console.log(t("queue.deleteSuccess"));
       } catch (err) {
@@ -126,9 +116,7 @@ const StaffDashboard = ({ user }) => {
 
   const confirmDeleteAllServicePoints = async () => {
     try {
-      await axios.delete(
-        `${API_BASE_URL}/api/queues/delete-all-service-points/`
-      );
+      await axios.delete(`${API_BASE_URL}/api/queues/delete-all-service-points/`);
       fetchServicePoints();
       console.log(t("messages.deleteAllSuccess"));
     } catch (err) {
@@ -181,6 +169,16 @@ const StaffDashboard = ({ user }) => {
             setNewServicePoint({ ...newServicePoint, location: e.target.value })
           }
         />
+        <label htmlFor="map_url">Map URL</label>
+        <input
+          id="map_url"
+          type="url"
+          placeholder="https://maps.app.goo.gl/..."
+          value={newServicePoint.map_url}
+          onChange={(e) =>
+            setNewServicePoint({ ...newServicePoint, map_url: e.target.value })
+          }
+        />
         <label htmlFor="is_active">
           <input
             id="is_active"
@@ -214,6 +212,13 @@ const StaffDashboard = ({ user }) => {
             <h3>{sp.name}</h3>
             <p>{sp.description || "No description available"}</p>
             <p>Location: {sp.location || "N/A"}</p>
+            {sp.map_url && (
+              <p>
+                <a href={sp.map_url} target="_blank" rel="noopener noreferrer">
+                  View on Map
+                </a>
+              </p>
+            )}
             <p>Active: {sp.is_active ? "Yes" : "No"}</p>
             <p>{t("staff.queueLength", { length: sp.queue_length || 0 })}</p>
             <button className="btn-call" onClick={() => callNext(sp.id)}>

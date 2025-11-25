@@ -55,9 +55,7 @@ const UserDashboard = ({ user }) => {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/service-points/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/service-points/`);
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -66,9 +64,7 @@ const UserDashboard = ({ user }) => {
 
   const fetchMyQueue = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/my-position/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/my-position/`);
       setMyQueue(response.data);
     } catch (err) {
       console.error(err);
@@ -77,9 +73,7 @@ const UserDashboard = ({ user }) => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/notifications/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/notifications/`);
       setNotifications(response.data);
     } catch (err) {
       console.error(err);
@@ -88,14 +82,12 @@ const UserDashboard = ({ user }) => {
 
   const markNotificationRead = async (notificationId) => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/api/queues/notifications/${notificationId}/mark-read/`
-      );
+      await axios.post(`${API_BASE_URL}/api/queues/notifications/${notificationId}/mark-read/`);
       setNotifications((prev) =>
         prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
     } catch (err) {
-      if (err.response && err.response.status === 401) {
+      if (err.response?.status === 401) {
         setError("Authentication failed. Please log in again.");
       } else {
         console.error(err);
@@ -110,7 +102,7 @@ const UserDashboard = ({ user }) => {
       });
       fetchMyQueue();
     } catch (err) {
-      if (err.response && err.response.status === 401) {
+      if (err.response?.status === 401) {
         setError("Authentication failed. Please log in again.");
       } else {
         console.error(err);
@@ -121,12 +113,10 @@ const UserDashboard = ({ user }) => {
   const leaveQueue = async () => {
     if (myQueue) {
       try {
-        await axios.post(`${API_BASE_URL}/api/queues/leave/`, {
-          service_point_id: myQueue.service_point.id,
-        });
+        await axios.post(`${API_BASE_URL}/api/queues/leave/`, { service_point_id: myQueue.service_point.id });
         setMyQueue(null);
       } catch (err) {
-        if (err.response && err.response.status === 401) {
+        if (err.response?.status === 401) {
           setError("Authentication failed. Please log in again.");
         } else {
           console.error(err);

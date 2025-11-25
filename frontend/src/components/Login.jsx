@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const Login = ({ onLogin, onSwitchToRegister }) => {
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -11,18 +12,16 @@ const Login = ({ onLogin, onSwitchToRegister }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/login/",
-        {
-          username,
-          password,
-        },
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login/`, {
+        username,
+        password,
+      });
       onLogin(response.data.user);
     } catch (err) {
+      console.error(err);
+      const errorData = err.response?.data;
       setError(
-        err.response?.data?.non_field_errors?.[0] || "Invalid credentials"
+        errorData?.non_field_errors?.[0] || "Invalid credentials"
       );
     }
   };

@@ -49,9 +49,7 @@ const HospitalDashboard = ({ user }) => {
 
   const fetchServicePoints = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/service-points/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/service-points/`);
       setServicePoints(response.data);
     } catch (err) {
       console.error(err);
@@ -60,9 +58,7 @@ const HospitalDashboard = ({ user }) => {
 
   const fetchAnalytics = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/queues/analytics/`
-      );
+      const response = await axios.get(`${API_BASE_URL}/api/queues/analytics/`);
       setAnalytics(response.data);
     } catch (err) {
       console.error(err);
@@ -71,10 +67,7 @@ const HospitalDashboard = ({ user }) => {
 
   const createServicePoint = async () => {
     try {
-      await axios.post(
-        `${API_BASE_URL}/api/queues/create-service-point/`,
-        newServicePoint
-      );
+      await axios.post(`${API_BASE_URL}/api/queues/create-service-point/`, newServicePoint);
       setNewServicePoint({
         name: "",
         description: "",
@@ -89,9 +82,7 @@ const HospitalDashboard = ({ user }) => {
 
   const callNext = async (servicePointId) => {
     try {
-      await axios.post(`${API_BASE_URL}/api/queues/call-next/`, {
-        service_point_id: servicePointId,
-      });
+      await axios.post(`${API_BASE_URL}/api/queues/call-next/`, { service_point_id: servicePointId });
       fetchServicePoints();
     } catch (err) {
       console.error(err);
@@ -110,9 +101,7 @@ const HospitalDashboard = ({ user }) => {
   const confirmDeleteServicePoint = async () => {
     if (deleteServicePointId) {
       try {
-        await axios.delete(
-          `${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`
-        );
+        await axios.delete(`${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`);
         fetchServicePoints();
         console.log(t("queue.deleteSuccess"));
       } catch (err) {
@@ -126,9 +115,7 @@ const HospitalDashboard = ({ user }) => {
 
   const confirmDeleteAllServicePoints = async () => {
     try {
-      await axios.delete(
-        `${API_BASE_URL}/api/queues/delete-all-service-points/`
-      );
+      await axios.delete(`${API_BASE_URL}/api/queues/delete-all-service-points/`);
       fetchServicePoints();
       console.log(t("messages.deleteAllSuccess"));
     } catch (err) {

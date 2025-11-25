@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import API_BASE_URL from "../config";
 
 const Register = ({ onRegister, onSwitchToLogin }) => {
   const { t } = useTranslation();
@@ -14,21 +15,20 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/auth/register/",
-        {
-          username,
-          email,
-          password,
-          role,
-          organization_type: role === "staff" ? organizationType : undefined,
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register/`, {
+        username,
+        email,
+        password,
+        role,
+        organization_type: role === "staff" ? organizationType : undefined,
+      });
       onRegister(response.data.user);
     } catch (err) {
+      console.error(err);
+      const errorData = err.response?.data;
       setError(
-        err.response?.data?.username?.[0] ||
-          err.response?.data?.non_field_errors?.[0] ||
+        errorData?.username?.[0] ||
+          errorData?.non_field_errors?.[0] ||
           "Registration failed"
       );
     }

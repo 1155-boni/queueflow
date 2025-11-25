@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from .serializers import RegisterSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -11,8 +12,8 @@ from .serializers import LoginSerializer
 from queues.models import ServicePoint
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-from datetime import timedelta
-from rest_framework_simplejwt.exceptions import TokenError
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -47,41 +48,50 @@ class CustomLoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.user
-        refresh = RefreshToken.for_user(user)
-        access_token = refresh.access_token
+        ip_address = request.META.get('REMOTE_ADDR', 'unknown')
+        user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
+        method = request.method
+        path = request.path
 
-        response = Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'role': user.role,
-                'organization_type': user.organization_type
-            }
-        }, status=status.HTTP_200_OK)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.user
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
 
-        # Set HTTP-only cookies
-        response.set_cookie(
-            key='access_token',
-            value=str(access_token),
-            httponly=True,
-            secure=False,  # Set to True in production with HTTPS
-            samesite='Lax',
-            max_age=timedelta(minutes=15).total_seconds()
-        )
-        response.set_cookie(
-            key='refresh_token',
-            value=str(refresh),
-            httponly=True,
-            secure=False,  # Set to True in production with HTTPS
-            samesite='Lax',
-            max_age=timedelta(days=7).total_seconds()
-        )
+            logger.info(f"Login successful - IP: {ip_address}, User-Agent: {user_agent}, Method: {method}, Path: {path}, Username: {user.username}")
 
-        return response
+            response = Response({
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'role': user.role,
+                    'organization_type': user.organization_type
+                }
+            }, status=status.HTTP_200_OK)
+
+            # Set HTTP-only cookies
+            response.set_cookie(
+                key='access_token',
+                value=str(access_token),
+                httponly=True,
+                secure=False,  # Set to True in production with HTTPS
+                samesite='Lax'
+            )
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                secure=False,  # Set to True in production with HTTPS
+                samesite='Lax'
+            )
+
+            return response
+        except ValidationError as e:
+            logger.warning(f"Login failed - IP: {ip_address}, User-Agent: {user_agent}, Method: {method}, Path: {path}, Errors: {e.detail}")
+            raise
 
 
 @csrf_exempt
@@ -89,32 +99,27 @@ class CustomLoginView(TokenObtainPairView):
 @permission_classes([AllowAny])
 def refresh_token(request):
     """
-    Refresh access token using refresh token from cookie.
+    Refresh access token using refresh token from cookies.
     """
-    refresh_token = request.COOKIES.get('refresh_token')
-    if not refresh_token:
+    refresh_token_value = request.COOKIES.get('refresh_token')
+    if not refresh_token_value:
         return Response({'error': 'Refresh token not found'}, status=status.HTTP_401_UNAUTHORIZED)
 
     try:
-        refresh = RefreshToken(refresh_token)
+        refresh = RefreshToken(refresh_token_value)
         access_token = refresh.access_token
 
-        response = Response({'message': 'Token refreshed'}, status=status.HTTP_200_OK)
+        response = Response({'message': 'Token refreshed successfully'}, status=status.HTTP_200_OK)
         response.set_cookie(
             key='access_token',
             value=str(access_token),
             httponly=True,
             secure=False,  # Set to True in production with HTTPS
-            samesite='Lax',
-            max_age=timedelta(minutes=15).total_seconds()
+            samesite='Lax'
         )
         return response
-    except TokenError:
-        # Clear invalid refresh token
-        response = Response({'error': 'Invalid refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
-        response.delete_cookie('refresh_token')
-        response.delete_cookie('access_token')
-        return response
+    except Exception as e:
+        return Response({'error': 'Invalid refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
