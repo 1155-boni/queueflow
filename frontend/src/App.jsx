@@ -11,6 +11,7 @@ import BankDashboard from "./components/BankDashboard.jsx";
 import GovernmentDashboard from "./components/GovernmentDashboard.jsx";
 import HospitalDashboard from "./components/HospitalDashboard.jsx";
 import Settings from "./components/Settings.jsx";
+import Logo from "./components/Logo.jsx";
 
 // Configure axios to send cookies with requests
 axios.defaults.withCredentials = true;
@@ -122,8 +123,9 @@ function App() {
 
   return (
     <div className="App">
-      <header>
-        <h1>LineHub - The Hub of Effortless Service</h1>
+      <header style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px 20px', borderBottom: '1px solid #ddd' }}>
+        <Logo />
+        <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#2C3E8F' }}>LineHub - The Hub of Effortless Service</h1>
         {user && (
           <nav>
             <span>Welcome, {user.username}</span>
