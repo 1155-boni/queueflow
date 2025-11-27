@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import Logo from "./Logo";
 
 function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
   const [servicePoints, setServicePoints] = useState([]);
@@ -19,8 +20,14 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
       setError("Unable to load service points at this time.");
     }
   };
+
   return (
     <div className="landing-page">
+      {/* Background Logo */}
+      <div className="background-logo" aria-hidden="true">
+        <Logo />
+      </div>
+
       {/* Hero Section */}
       <section className="hero">
         <h1>Welcome to LineHub</h1>
@@ -200,7 +207,7 @@ function LandingPage({ onSwitchToLogin, onSwitchToRegister }) {
           </div>
           <div className="testimonial">
             <p>
-              "In healthcare, every minute counts. LineHub helps us prioritize
+              "In healthcare, every minute counts. LineHub helps prioritize
               emergencies while managing regular patients."
             </p>
             <cite>- Dr. Emily Rodriguez, Hospital Director</cite>

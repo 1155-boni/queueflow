@@ -125,7 +125,7 @@ function App() {
     <div className="App">
       <header style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px 20px', borderBottom: '1px solid #ddd' }}>
         <Logo />
-        <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#2C3E8F' }}>LineHub - The Hub of Effortless Service</h1>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#b3bbe7ff' }}>LineHub - The Hub of Effortless Service</h1>
         {user && (
           <nav>
             <span>Welcome, {user.username}</span>

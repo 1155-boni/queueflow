@@ -54,6 +54,8 @@ class ServicePoint(models.Model):
     max_queue_length = models.PositiveIntegerField(default=50)
     display_screen_url = models.URLField(blank=True, help_text="URL for public display screen")
 
+    is_paused = models.BooleanField(default=False)  # New field to pause/resume services at service point
+
     def __str__(self):
         return self.name
 
@@ -217,6 +219,7 @@ class QueueEntry(models.Model):
         ('called', 'Called'),
         ('served', 'Served'),
         ('abandoned', 'Abandoned'),
+        ('paused', 'Paused'),  # Added for pause/resume functionality
     )
 
     service_point = models.ForeignKey(ServicePoint, on_delete=models.CASCADE, related_name='queue_entries')
@@ -235,6 +238,8 @@ class QueueEntry(models.Model):
     ticket_number = models.CharField(max_length=20, unique=True, blank=True)
     qr_code = models.CharField(max_length=100, blank=True)
     sms_sent = models.BooleanField(default=False)
+
+    staff_notes = models.TextField(blank=True)  # New field for staff quick notes
 
     class Meta:
         ordering = ['priority_level', 'position']

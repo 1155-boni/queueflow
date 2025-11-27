@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import API_BASE_URL from "../config";
-
-
+import "../styles/Settings.css";
 
 const Settings = ({ user, onLogout, onDeleteAccount, onBackToDashboard }) => {
   const { t, i18n } = useTranslation();

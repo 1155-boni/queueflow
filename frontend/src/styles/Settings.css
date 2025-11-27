@@ -1,0 +1,258 @@
+.settings {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background: var(--bg-primary, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings h2 {
+  color: var(--text-primary, #333);
+  font-size: 28px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #5b6eef;
+  padding-bottom: 15px;
+}
+
+.setting-group {
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-group label {
+  color: var(--text-primary, #333);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.setting-group select {
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--bg-secondary, #f9f9f9);
+  color: var(--text-primary, #333);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.setting-group select:hover {
+  border-color: #5b6eef;
+  box-shadow: 0 0 8px rgba(91, 110, 239, 0.2);
+}
+
+.setting-group select:focus {
+  outline: none;
+  border-color: #5b6eef;
+  box-shadow: 0 0 12px rgba(91, 110, 239, 0.3);
+}
+
+.btn-primary,
+.btn-logout,
+.btn-delete {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #5b6eef;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #4c5dd4;
+  box-shadow: 0 4px 12px rgba(91, 110, 239, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-logout {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-logout:hover {
+  background: #d97706;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active,
+.btn-logout:active,
+.btn-delete:active {
+  transform: translateY(0);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-primary, #ffffff);
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal h3 {
+  color: var(--text-primary, #333);
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.modal p {
+  color: var(--text-secondary, #666);
+  font-size: 16px;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-confirm {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #d0d0d0;
+}
+
+.btn-confirm {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Dark Theme Support */
+body.dark .settings {
+  background: #1e1e1e;
+  color: #e0e0e0;
+}
+
+body.dark .settings h2 {
+  color: #e0e0e0;
+  border-bottom-color: #6b7aff;
+}
+
+body.dark .setting-group label {
+  color: #e0e0e0;
+}
+
+body.dark .setting-group select {
+  background: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+body.dark .setting-group select:hover {
+  border-color: #6b7aff;
+  box-shadow: 0 0 8px rgba(107, 122, 255, 0.2);
+}
+
+body.dark .modal {
+  background: #2d2d2d;
+  color: #e0e0e0;
+}
+
+body.dark .modal h3 {
+  color: #e0e0e0;
+}
+
+body.dark .modal p {
+  color: #b0b0b0;
+}
+
+body.dark .btn-cancel {
+  background: #444;
+  color: #e0e0e0;
+}
+
+body.dark .btn-cancel:hover {
+  background: #555;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .settings {
+    padding: 20px 15px;
+  }
+
+  .settings h2 {
+    font-size: 24px;
+  }
+
+  .modal {
+    max-width: 90%;
+    margin: 0 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-confirm {
+    width: 100%;
+  }
+}

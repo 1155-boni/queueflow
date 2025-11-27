@@ -1,72 +1,54 @@
-# Government Office Features Implementation Plan
+# TODO: Government Office Module Implementation
 
-## Overview
-Implement comprehensive government office features for LineHub queue management system, including multi-service queues, digital ticketing, smart routing, display screens, feedback systems, appointments, priority handling, and more.
+## Backend
+- [ ] Enhance backend/queues/models.py to include:
+  - Priority queue types (elderly, disabled, pregnant, VIP) support
+  - Pause/Resume flags for service points and counters
+  - Staff notes on QueueEntry
+- [ ] Extend backend/queues/views.py:
+  - API for redirect citizen to another service point/counter
+  - API for pause/resume service
+  - APIs for staff notes management
+  - Admin APIs for managing services, counters, staff, priorities, appointment rules
+  - Analytics endpoints for reports, audit logs, staff performance
+  - Integrate Twilio SMS notification hooks (optional)
+- [ ] Update backend/queues/serializers.py to support new models and API inputs/outputs
+- [ ] Extend backend/queues/consumers.py for real-time:
+  - Pause/Resume notifications
+  - Citizen redirects
+  - Queue completion notifications and staff dashboard updates
 
-## Current State Analysis
-- Basic queue system with ServicePoint, QueueEntry, Notification models
-- GovernmentDashboard.jsx has minimal features (service points, analytics)
-- Backend supports basic queue operations
-- Existing infrastructure: Django REST, React, WebSockets, Celery
+## Frontend
+- [ ] Extend frontend/src/components/AppointmentBooking.jsx to handle:
+  - Join queue via ticket, QR code, online
+  - Priority queue choices
+  - SMS/Push notification opt-in
+  - Appointment viewing and scheduling
+- [ ] Develop frontend/src/components/CitizenQueueStatus.jsx:
+  - Display estimated waiting time
+  - Notifications for turn
+  - Appointment schedule
+- [ ] Extend frontend/src/components/StaffDashboard.jsx:
+  - Add redirect citizen to another counter
+  - Add pause/resume service buttons
+  - Add quick notes input for queue entries
+  - Real-time queue list updates
+- [ ] Develop frontend/src/components/AdminDashboard.jsx:
+  - Manage all services, counters, and staff
+  - Manage priorities and appointment rules
+  - View daily/weekly/monthly reports and analytics
+  - Audit log viewer
+- [ ] Develop frontend/src/components/DisplayScreen.jsx:
+  - Show Now Serving, counter number, queue list
+  - Display emergency or office announcements
+- [ ] Use Tailwind CSS styling consistently in all UI components
+- [ ] Setup WebSocket handling for real-time updates in all relevant components
 
-## Implementation Plan
+## Testing & Deployment
+- [ ] Add backend unit tests for new API endpoints and models
+- [ ] Add frontend tests for new components and UI flows
+- [ ] Integrate and test Twilio SMS notifications if enabled
+- [ ] Document Government Office Module usage and setup instructions
 
-### Phase 1: Backend Model Extensions
-- [ ] Extend ServicePoint model for government-specific fields (service_types, priority_levels, etc.)
-- [ ] Add ServiceType model for multi-service queues
-- [ ] Add Appointment model for booking system
-- [ ] Add Feedback model for citizen feedback
-- [ ] Add PriorityQueue model for priority handling
-- [ ] Add Announcement model for public announcements
-- [ ] Add DocumentCheck model for document verification
-- [ ] Add AuditLog model for security logging
-- [ ] Create database migrations
-
-### Phase 2: Backend API Extensions
-- [ ] Update serializers for new models
-- [ ] Add views for appointments, feedback, announcements
-- [ ] Implement priority queue algorithms
-- [ ] Add QR code generation endpoints
-- [ ] Add SMS notification system
-- [ ] Implement smart routing logic
-- [ ] Add audit logging middleware
-- [ ] Update existing views for government features
-
-### Phase 3: Frontend Component Updates
-- [ ] Enhance GovernmentDashboard.jsx with new features
-- [ ] Create AppointmentBooking component
-- [ ] Create FeedbackForm component
-- [ ] Create DisplayScreen component
-- [ ] Create PriorityQueueManager component
-- [ ] Create AnnouncementManager component
-- [ ] Create DocumentCheck component
-- [ ] Create AdminAnalyticsDashboard component
-- [ ] Add QR code scanner/generator components
-
-### Phase 4: Integration and Features
-- [ ] Implement WebSocket updates for real-time features
-- [ ] Add Celery tasks for SMS notifications
-- [ ] Update translations for new features
-- [ ] Implement security features (audit logs, access controls)
-- [ ] Add performance monitoring endpoints
-
-### Phase 5: Testing and Deployment
-- [ ] Update TODO.md with comprehensive testing plan
-- [ ] Test all new APIs with Postman/curl
-- [ ] Test frontend components
-- [ ] Integration testing
-- [ ] Performance testing
-- [ ] Security testing
-
-## Key Technical Considerations
-- Maintain backward compatibility with existing queue system
-- Implement proper authentication and authorization
-- Ensure real-time updates via WebSockets
-- Add proper error handling and validation
-- Follow existing code patterns and architecture
-
-## Dependencies
-- QR code library (qrcode, pillow)
-- SMS service integration (Twilio or similar)
-- Additional React components for new features
-- Database migrations for new models
+---
+Start with backend model and API enhancements, then frontend components, followed by real-time handling and testing.
