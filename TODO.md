@@ -12,5 +12,5 @@
 - [ ] Update CSS if needed for the filter UI
 - [ ] Install @googlemaps/js-api-loader package
 - [ ] Set up REACT_APP_GOOGLE_MAPS_API_KEY environment variable
-- [ ] Run database migration
+- [x] Run database migration
 - [ ] Populate latitude/longitude data for service points
