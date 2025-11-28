@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from django.core.cache import cache
 from .serializers import QueueEntrySerializer, ServicePointSerializer
 from .models import QueueEntry, ServicePoint
 
@@ -23,6 +24,11 @@ class QueueConsumer(AsyncWebsocketConsumer):
             self.service_point_group_name,
             self.channel_name
         )
+
+        # Remove channel name from cache
+        if hasattr(self, 'user') and self.user.is_authenticated:
+            cache_key = f'queue_channel_{self.service_point_id}_{self.user.id}'
+            cache.delete(cache_key)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)

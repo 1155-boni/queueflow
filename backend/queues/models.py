@@ -217,6 +217,7 @@ class PriorityQueue(models.Model):
 
 class QueueEntry(models.Model):
     STATUS_CHOICES = (
+        ('joined', 'Joined'),
         ('waiting', 'Waiting'),
         ('called', 'Called'),
         ('served', 'Served'),
@@ -227,7 +228,7 @@ class QueueEntry(models.Model):
     service_point = models.ForeignKey(ServicePoint, on_delete=models.CASCADE, related_name='queue_entries')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='queue_entries')
     position = models.PositiveIntegerField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='waiting')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='joined')
     joined_at = models.DateTimeField(auto_now_add=True)
     called_at = models.DateTimeField(null=True, blank=True)
     served_at = models.DateTimeField(null=True, blank=True)

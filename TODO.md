@@ -1,16 +1,2 @@
-- [x] Add axios response interceptor in frontend/src/index.js to handle 401 errors by refreshing token and retrying request
-- [x] Test the authentication flow to ensure token refresh works
-- [x] Add filter state and UI to UserDashboard.jsx
-- [x] Implement filtering logic
-- [x] Add latitude and longitude fields to ServicePoint model
-- [x] Update serializer to include location fields
-- [x] Create database migration for location fields
-- [x] Create ServicePointMap component with Google Maps integration
-- [x] Add view mode toggle (List/Map) to UserDashboard
-- [x] Integrate map component into UserDashboard
-- [ ] Test the filter functionality
-- [ ] Update CSS if needed for the filter UI
-- [ ] Install @googlemaps/js-api-loader package
-- [ ] Set up REACT_APP_GOOGLE_MAPS_API_KEY environment variable
-- [x] Run database migration
-- [ ] Populate latitude/longitude data for service points
+- [x] Update UserDashboard.jsx: Pass userQueue to ServicePointMap and call fetchServicePoints after joinQueue
+- [x] Update ServicePointMap.jsx: Check if user is in queue for service point and show "Joined" button

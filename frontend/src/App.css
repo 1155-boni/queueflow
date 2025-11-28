@@ -15,7 +15,7 @@
 
   .btn-primary,
   .btn-secondary {
-    width: 100%;
+    width: 10%;
     max-width: 300px;
   }
 }
@@ -60,20 +60,22 @@
   }
 }
 
-/* Cards and grids */
-.feature-card, .service-point-card, .stat-item, .testimonial {
+/* Modern Cards and grids */
+.feature-card, .service-point-card, .stat-item, .testimonial, .metric-card {
   background: var(--bg-primary);
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  padding: 20px;
-  margin: 12px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+  padding: 24px;
+  margin: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
 }
 
-.feature-card:hover, .service-point-card:hover, .testimonial:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+.feature-card:hover, .service-point-card:hover, .testimonial:hover, .metric-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.1);
 }
 
 /* Fade-in animation for cards */
@@ -153,8 +155,23 @@
 /* Service Points Grid */
 .service-points-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+}
+
+.service-point-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.service-point-card .btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.service-point-card .btn-danger:hover {
+  background-color: #c82333;
 }
 
 /* Buttons */
@@ -187,6 +204,26 @@
 .btn-secondary:hover {
   background-color: #0078D7;
   color: white;
+}
+
+.btn-delete-all {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.15s ease;
+  font-weight: 600;
+  display: inline-block;
+  width: auto;
+  white-space: nowrap;
+}
+
+.btn-delete-all:hover {
+  background-color: #b71c1c;
+  transform: translateY(-2px);
 }
 
 /* Hero Section Animation */
@@ -461,21 +498,7 @@
   font-weight: 600;
 }
 
-.btn-delete-all {
-  background-color: #d32f2f;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  margin-bottom: 20px;
-  transition: background-color 0.3s ease;
-}
 
-.btn-delete-all:hover {
-  background-color: #b71c1c;
-}
 
 .service-card {
   background: white;
@@ -792,21 +815,31 @@ main {
     margin-top: 10px;
   }
 }
-/* User Dashboard Styles */
+/* Modern User Dashboard Styles */
 .dashboard {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   min-height: 100vh;
-  padding: 20px;
+  padding: 40px 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .dashboard h2 {
   color: var(--text-primary);
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 2.5rem;
+  margin-bottom: 40px;
+  font-size: 2.8rem;
   font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  animation: fadeInUp 1s ease forwards;
+}
+
+.dashboard > * {
+  max-width: 1200px;
+  width: 100%;
 }
 
 .error-message {

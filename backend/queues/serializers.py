@@ -21,15 +21,15 @@ class ServicePointSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServicePoint
         fields = (
-            'id', 'name', 'description', 'location', 'latitude', 'longitude', 'map_url', 'is_active',
-            'created_at', 'queue_length', 'organization_type', 'service_types',
-            'supports_appointments', 'supports_priority', 'max_queue_length',
-            'display_screen_url'
+            'id', 'name', 'description', 'bank_name', 'branch', 'location', 'latitude', 'longitude',
+            'directions', 'teller_no', 'map_url', 'is_active', 'created_at', 'queue_length',
+            'organization_type', 'service_types', 'supports_appointments', 'supports_priority',
+            'max_queue_length', 'display_screen_url', 'is_paused'
         )
         read_only_fields = ('created_at', 'queue_length')
 
     def get_queue_length(self, obj):
-        return obj.queue_entries.filter(status__in=['waiting', 'called']).count()
+        return obj.queue_entries.filter(status__in=['joined', 'waiting', 'called']).count()
 
 
 class QueueEntrySerializer(serializers.ModelSerializer):

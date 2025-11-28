@@ -95,7 +95,7 @@ def join_queue(request):
     # Check if user is already in any queue
     existing_entry = QueueEntry.objects.filter(
         user=request.user,
-        status__in=['waiting', 'called']
+        status__in=['joined', 'waiting', 'called']
     ).first()
     if existing_entry:
         return Response({'error': 'You are already in a queue.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -140,15 +140,14 @@ def my_queue_position(request):
     """
     Return user's current position in queue.
     """
-    try:
-        queue_entry = QueueEntry.objects.get(
-            user=request.user,
-            status__in=['waiting', 'called']
-        )
-        serializer = QueueEntrySerializer(queue_entry)
-        return Response(serializer.data)
-    except QueueEntry.DoesNotExist:
+    queue_entry = QueueEntry.objects.filter(
+        user=request.user,
+        status__in=['joined', 'waiting', 'called']
+    ).order_by('-joined_at').first()
+    if not queue_entry:
         return Response({'error': 'You are not in any queue.'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = QueueEntrySerializer(queue_entry)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -195,6 +194,24 @@ def delete_service_point(request, service_point_id):
     except ServicePoint.DoesNotExist:
         return Response({'error': 'Service point not found or you do not own it.'}, status=status.HTTP_404_NOT_FOUND)
 
+    # Mark all active queue entries as abandoned before deleting
+    QueueEntry.objects.filter(
+        service_point=service_point,
+        status__in=['joined', 'waiting', 'called']
+    ).update(status='abandoned')
+
+    # Send notifications to users in the queue
+    active_entries = QueueEntry.objects.filter(service_point=service_point, status='abandoned')
+    for entry in active_entries:
+        Notification.objects.create(
+            user=entry.user,
+            message=f'The service point {service_point.name} has been closed. Your queue entry has been cancelled.'
+        )
+        send_queue_notification_email(
+            entry.user.email,
+            f'The service point {service_point.name} has been closed. Your queue entry has been cancelled.'
+        )
+
     service_point.delete()
     return Response({'message': 'Service point deleted successfully.'})
 
@@ -225,7 +242,7 @@ def call_next(request):
     try:
         queue_entry = QueueEntry.objects.filter(
             service_point__creator=request.user,
-            status='waiting'
+            status='joined'
         ).order_by('position').first()
 
         if not queue_entry:
@@ -305,31 +322,43 @@ def analytics(request):
 @permission_classes([IsAuthenticated])
 def leave_queue(request):
     """
-    Allow users to leave queue.
+    Allow users to leave a specific queue.
     """
-    try:
-        queue_entry = QueueEntry.objects.get(
+    queue_entry_id = request.data.get('queue_entry_id')
+
+    if queue_entry_id:
+        # Leave specific queue
+        try:
+            queue_entry = QueueEntry.objects.get(
+                id=queue_entry_id,
+                user=request.user,
+                status__in=['joined', 'waiting', 'called']
+            )
+        except QueueEntry.DoesNotExist:
+            return Response({'error': 'Queue entry not found or you do not own it.'}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        # Leave current active queue (backward compatibility)
+        queue_entry = QueueEntry.objects.filter(
             user=request.user,
-            status__in=['waiting', 'called']
-        )
+            status__in=['joined', 'waiting', 'called']
+        ).order_by('-joined_at').first()
+        if not queue_entry:
+            return Response({'error': 'You are not in any queue.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Mark as abandoned
-        queue_entry.status = 'abandoned'
-        queue_entry.save()
+    # Mark as abandoned
+    queue_entry.status = 'abandoned'
+    queue_entry.save()
 
-        # Update positions of remaining customers
-        QueueEntry.objects.filter(
-            service_point=queue_entry.service_point,
-            position__gt=queue_entry.position,
-            status='waiting'
-        ).update(position=F('position') - 1)
+    # Update positions of remaining customers
+    QueueEntry.objects.filter(
+        service_point=queue_entry.service_point,
+        position__gt=queue_entry.position,
+        status__in=['waiting', 'called']
+    ).update(position=F('position') - 1)
 
-        send_queue_update(queue_entry.service_point.id)
+    send_queue_update(queue_entry.service_point.id)
 
-        return Response({'message': 'Successfully left the queue.'})
-
-    except QueueEntry.DoesNotExist:
-        return Response({'error': 'You are not in any queue.'}, status=status.HTTP_404_NOT_FOUND)
+    return Response({'message': 'Successfully left the queue.'})
 
 
 @api_view(['GET'])
@@ -356,3 +385,28 @@ def mark_notification_read(request, notification_id):
         return Response({'message': 'Notification marked as read.'})
     except Notification.DoesNotExist:
         return Response({'error': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_notification(request, notification_id):
+    """
+    Delete a notification.
+    """
+    try:
+        notification = Notification.objects.get(id=notification_id, user=request.user)
+        notification.delete()
+        return Response({'message': 'Notification deleted successfully.'})
+    except Notification.DoesNotExist:
+        return Response({'error': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_queues(request):
+    """
+    Get all queue entries for the user (historical and active).
+    """
+    queue_entries = QueueEntry.objects.filter(user=request.user).order_by('-joined_at')
+    serializer = QueueEntrySerializer(queue_entries, many=True)
+    return Response(serializer.data)

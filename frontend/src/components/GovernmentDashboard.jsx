@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import ServicePointMap from "./ServicePointMap";
 
 const GovernmentDashboard = ({ user }) => {
   const { t } = useTranslation();
@@ -13,9 +14,7 @@ const GovernmentDashboard = ({ user }) => {
     location: "",
     is_active: true,
   });
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteServicePointId, setDeleteServicePointId] = useState(null);
-  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
+
   const wsRefs = useRef({});
 
   useEffect(() => {
@@ -89,46 +88,21 @@ const GovernmentDashboard = ({ user }) => {
     }
   };
 
-  const handleDeleteClick = (servicePointId) => {
-    setDeleteServicePointId(servicePointId);
-    setShowDeleteConfirm(true);
-  };
-
-  const handleDeleteAllClick = () => {
-    setShowDeleteAllConfirm(true);
-  };
-
-  const confirmDeleteServicePoint = async () => {
-    if (deleteServicePointId) {
+  const deleteServicePoint = async (servicePointId) => {
+    if (window.confirm('Are you sure you want to delete this service point?')) {
       try {
-        await axios.delete(`${API_BASE_URL}/api/queues/delete-service-point/${deleteServicePointId}/`);
+        await axios.delete(`${API_BASE_URL}/api/queues/delete-service-point/${servicePointId}/`);
         fetchServicePoints();
-        console.log(t("queue.deleteSuccess"));
       } catch (err) {
         console.error(err);
-        console.error(t("messages.deleteServicePointError"));
       }
     }
-    setShowDeleteConfirm(false);
-    setDeleteServicePointId(null);
   };
 
-  const confirmDeleteAllServicePoints = async () => {
-    try {
-      await axios.delete(`${API_BASE_URL}/api/queues/delete-all-service-points/`);
-      fetchServicePoints();
-      console.log(t("messages.deleteAllSuccess"));
-    } catch (err) {
-      console.error(err);
-      console.error(t("messages.deleteAllError"));
-    }
-    setShowDeleteAllConfirm(false);
-  };
 
-  const cancelDelete = () => {
-    setShowDeleteConfirm(false);
-    setDeleteServicePointId(null);
-    setShowDeleteAllConfirm(false);
+
+  const handleLocationPin = (location) => {
+    setNewServicePoint({ ...newServicePoint, latitude: location.latitude, longitude: location.longitude });
   };
 
   return (
@@ -192,6 +166,11 @@ const GovernmentDashboard = ({ user }) => {
             setNewServicePoint({ ...newServicePoint, location: e.target.value })
           }
         />
+        <ServicePointMap
+          servicePoints={servicePoints}
+          onLocationPin={handleLocationPin}
+          pinnedLocation={newServicePoint.latitude && newServicePoint.longitude ? { latitude: newServicePoint.latitude, longitude: newServicePoint.longitude } : null}
+        />
         <label htmlFor="is_active">
           <input
             id="is_active"
@@ -210,80 +189,31 @@ const GovernmentDashboard = ({ user }) => {
           {t("staff.createServicePoint")}
         </button>
       </div>
-      <div className="service-points">
-        <h3>
-          {t("dashboard.servicePoints")}{" "}
-          <span className="realtime">{t("common.realtime")}</span>
-        </h3>
-        {servicePoints.length > 0 && (
-          <button className="btn-delete-all" onClick={handleDeleteAllClick}>
-            Delete All Service Points
-          </button>
-        )}
-        {servicePoints.map((sp) => (
-          <div key={sp.id} className="service-card">
-            <h3>{sp.name}</h3>
-            <p>{sp.description || "No description available"}</p>
-            <p>Location: {sp.location || "N/A"}</p>
-            <p>Active: {sp.is_active ? "Yes" : "No"}</p>
-            <p>{t("staff.queueLength", { length: sp.queue_length || 0 })}</p>
-            <button className="btn-call" onClick={() => callNext(sp.id)}>
-              {t("dashboard.callNext")}
-            </button>
-            <button
-              className="btn-delete"
-              onClick={() => handleDeleteClick(sp.id)}
-            >
-              {t("dashboard.delete")}
-            </button>
-          </div>
-        ))}
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h3>{t("queue.deleteConfirm")}</h3>
-              <p>{t("common.confirmMessage")}</p>
-              <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>
-                  {t("common.cancel")}
-                </button>
-                <button
-                  className="btn-confirm"
-                  onClick={confirmDeleteServicePoint}
-                >
-                  {t("common.confirm")}
-                </button>
+      <div className="service-points-management">
+        <h3>Your Service Points</h3>
+        {servicePoints.length > 0 ? (
+          <div className="service-points-grid">
+            {servicePoints.map((sp) => (
+              <div key={sp.id} className="service-point-card">
+                <h4>{sp.name}</h4>
+                <p><strong>Location:</strong> {sp.location || 'Not specified'}</p>
+                <p><strong>Queue Length:</strong> {sp.queue_length || 0}</p>
+                <div className="service-point-actions">
+                  <button className="btn-secondary" onClick={() => callNext(sp.id)}>
+                    Call Next Customer
+                  </button>
+                  <button className="btn-danger" onClick={() => deleteServicePoint(sp.id)}>
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-        )}
-
-        {/* Delete All Confirmation Modal */}
-        {showDeleteAllConfirm && (
-          <div className="modal-overlay">
-            <div className="modal">
-              <h3>Delete All Service Points</h3>
-              <p>
-                Are you sure you want to delete ALL your service points? This
-                action cannot be undone.
-              </p>
-              <div className="modal-actions">
-                <button className="btn-cancel" onClick={cancelDelete}>
-                  {t("common.cancel")}
-                </button>
-                <button
-                  className="btn-confirm"
-                  onClick={confirmDeleteAllServicePoints}
-                >
-                  {t("common.confirm")}
-                </button>
-              </div>
-            </div>
-          </div>
+        ) : (
+          <p>No service points created yet.</p>
         )}
       </div>
+
       <div className="analytics">
         <h3>
           {t("dashboard.analytics")}{" "}

@@ -8,31 +8,37 @@ from .utils import send_queue_notification_email
 @shared_task
 def send_queue_update(service_point_id):
     """
-    Task to send queue update notifications.
+    Task to send queue update notifications to joined users only.
     """
     from channels.layers import get_channel_layer
     from asgiref.sync import async_to_sync
+    from django.core.cache import cache
     from .models import QueueEntry
 
     try:
         channel_layer = get_channel_layer()
 
-        # Get current queue length
-        queue_length = QueueEntry.objects.filter(
+        # Get joined users (joined, waiting or called)
+        joined_entries = QueueEntry.objects.filter(
             service_point_id=service_point_id,
-            status__in=['waiting', 'called']
-        ).count()
+            status__in=['joined', 'waiting', 'called']
+        ).select_related('user')
 
-        async_to_sync(channel_layer.group_send)(
-            f'queue_{service_point_id}',
-            {
-                'type': 'queue_update',
-                'data': {
-                    'queue_length': queue_length,
-                    'service_point_id': service_point_id
-                }
-            }
-        )
+        # Send position updates to each joined user individually
+        for entry in joined_entries:
+            cache_key = f'queue_channel_{service_point_id}_{entry.user.id}'
+            channel_name = cache.get(cache_key)
+            if channel_name:
+                async_to_sync(channel_layer.send)(
+                    channel_name,
+                    {
+                        'type': 'queue_update',
+                        'data': {
+                            'position': entry.position,
+                            'service_point_id': service_point_id
+                        }
+                    }
+                )
     except Exception as e:
         # Log the error but don't fail the task
         print(f"Error sending queue update: {e}")

@@ -16,6 +16,64 @@ import Logo from "./components/Logo.jsx";
 // Configure axios to send cookies with requests
 axios.defaults.withCredentials = true;
 
+// Add axios interceptor for automatic token refresh
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return axios(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      return new Promise((resolve, reject) => {
+        axios.post(`${API_BASE_URL}/api/auth/refresh/`)
+          .then(({ data }) => {
+            processQueue(null);
+            resolve(axios(originalRequest));
+          })
+          .catch((err) => {
+            processQueue(err, null);
+            // If refresh fails, redirect to login
+            window.location.reload(); // This will trigger the auth check and redirect to landing
+            reject(err);
+          })
+          .finally(() => {
+            isRefreshing = false;
+          });
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState("landing");
