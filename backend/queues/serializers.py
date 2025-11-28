@@ -21,7 +21,7 @@ class ServicePointSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServicePoint
         fields = (
-            'id', 'name', 'description', 'location', 'map_url', 'is_active',
+            'id', 'name', 'description', 'location', 'latitude', 'longitude', 'map_url', 'is_active',
             'created_at', 'queue_length', 'organization_type', 'service_types',
             'supports_appointments', 'supports_priority', 'max_queue_length',
             'display_screen_url'

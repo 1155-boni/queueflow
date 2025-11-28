@@ -13,7 +13,7 @@ const Logo = () => {
     >
       <title>LineHub Logo</title>
       {/* Background circle in neutral gray */}
-      <circle cx="32" cy="32" r="30" stroke="#7D7D7D" strokeWidth="4" fill="white" />
+      <circle cx="32" cy="32" r="30" stroke="#FFFFFF" strokeWidth="4" fill="none" />
       {/* Queue or people stylized as three vertical bars/arrows in deep blue and royal purple */}
       <rect x="18" y="18" width="6" height="28" fill="#2C3E8F" />
       <rect x="29" y="12" width="6" height="34" fill="#5E35B1" />

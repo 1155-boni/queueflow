@@ -35,6 +35,8 @@ class ServicePoint(models.Model):
     bank_name = models.CharField(max_length=100, blank=True)
     branch = models.CharField(max_length=100, blank=True)
     location = models.CharField(max_length=200, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Latitude coordinate")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Longitude coordinate")
     directions = models.TextField(blank=True)
     teller_no = models.CharField(max_length=10, blank=True)
     map_url = models.URLField(blank=True, help_text="Google Maps link for the service point location")

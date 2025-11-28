@@ -6,30 +6,35 @@ import App from "./App.jsx";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./i18n";
 import axios from "axios";
+import API_BASE_URL from "./config";
 
 
 // Configure axios to send credentials with requests
 axios.defaults.withCredentials = true;
 
-// Add response interceptor to handle token refresh
+// Add response interceptor to handle token refresh on 401
 axios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       try {
-        await axios.post("http://localhost:8000/api/auth/refresh/");
+        // Attempt to refresh the token
+        await axios.post(`${API_BASE_URL}/api/auth/refresh/`);
+        // Retry the original request
         return axios(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, clear local storage
-        console.error("Token refresh failed:", refreshError);
-        // Clear any local state
-        localStorage.clear();
-        sessionStorage.clear();
-        // Do not redirect; let the app handle unauthenticated state
+        // If refresh fails, redirect to login or handle logout
+        console.error('Token refresh failed:', refreshError);
+        // Optionally, you can emit an event or call a logout function here
+        // For now, just reject the error
+        return Promise.reject(error);
       }
     }
+
     return Promise.reject(error);
   }
 );

@@ -16,27 +16,6 @@ import Logo from "./components/Logo.jsx";
 // Configure axios to send cookies with requests
 axios.defaults.withCredentials = true;
 
-// Axios interceptor for handling 401 errors by refreshing tokens via cookies
-axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        // Attempt to refresh the token (backend handles cookies)
-        await axios.post(`${API_BASE_URL}/api/auth/refresh/`);
-        // Retry the original request
-        return axios(originalRequest);
-      } catch (refreshError) {
-        // If refresh fails, redirect to login
-        window.location.href = '/';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
 function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState("landing");
@@ -64,18 +43,9 @@ function App() {
         setUser(response.data);
         setView("dashboard");
       } catch (error) {
-        // If token is invalid or expired, try to refresh
-        try {
-          await axios.post(`${API_BASE_URL}/api/auth/refresh/`);
-          // If refresh successful, retry the profile request
-          const response = await axios.get(`${API_BASE_URL}/api/auth/profile/`);
-          setUser(response.data);
-          setView("dashboard");
-        } catch (refreshError) {
-          // If refresh fails, user is not authenticated - keep landing page
-          setUser(null);
-          // Keep landing page as default view
-        }
+        // If token is invalid or expired, user is not authenticated - keep landing page
+        setUser(null);
+        // Keep landing page as default view
       }
     };
 
@@ -123,9 +93,9 @@ function App() {
 
   return (
     <div className="App">
-      <header style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px 20px', borderBottom: '1px solid #ddd' }}>
+      <header className="navbar">
         <Logo />
-        <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#b3bbe7ff' }}>LineHub - The Hub of Effortless Service</h1>
+        <h1>LineHub - The Hub of Effortless Service</h1>
         {user && (
           <nav>
             <span>Welcome, {user.username}</span>
